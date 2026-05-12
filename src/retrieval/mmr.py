@@ -13,7 +13,6 @@ def mmr_rerank(
     top_k: int,
     lambda_param: float = 0.5,
 ) -> list[SearchResult]:
-    """Rerank results to balance relevance and diversity."""
     if not results:
         return []
 

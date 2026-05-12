@@ -8,7 +8,6 @@ from config import SearchResult
 
 
 class BaseVectorStore(ABC):
-    """Interface for vector storage backends."""
 
     @abstractmethod
     def add(self, ids: list[str], embeddings: np.ndarray, metadata: list[dict]) -> None:

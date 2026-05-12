@@ -14,7 +14,6 @@ logger = logging.getLogger(__name__)
 
 
 class StrategyB(BaseRetriever):
-    """Enhanced retriever — expands the query before searching."""
 
     def __init__(
         self,
@@ -33,7 +32,6 @@ class StrategyB(BaseRetriever):
         return self._store.search(q_vec, top_k)
 
     def multi_query_retrieve(self, query: str, top_k: int) -> list[SearchResult]:
-        """Generate 3 sub-queries, retrieve for each, merge by avg score."""
         sub_query_prompt = (
             f"Generate 3 different versions of this search query, "
             f"each on a new line. Original query: {query}"

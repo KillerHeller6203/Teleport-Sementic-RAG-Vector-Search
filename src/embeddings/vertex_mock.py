@@ -19,7 +19,6 @@ class _EmbeddingValue:
 
 
 class MockVertexEmbeddingModel:
-    """Drop-in mock for vertexai TextEmbeddingModel."""
 
     def __init__(self, underlying_embedder: BaseEmbedder) -> None:
         self._embedder = underlying_embedder
@@ -67,7 +66,6 @@ class _GenerationResponse:
 
 
 class MockGenerativeModel:
-    """Rule-based stand-in for Gemini. Expands queries using synonym dict."""
 
     def __init__(self, model_name=None) -> None:
         logger.info("MockGenerativeModel initialised (rule-based expansion)")

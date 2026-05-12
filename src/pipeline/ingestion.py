@@ -13,7 +13,6 @@ logger = logging.getLogger(__name__)
 
 
 class DocumentChunker:
-    """Recursive character splitter with overlap."""
 
     _SEPARATORS = ["\n\n", "\n", ". ", " "]
 
@@ -103,7 +102,6 @@ class DocumentChunker:
 
 
 class IngestionPipeline:
-    """Chunk -> embed -> store."""
 
     def __init__(
         self,

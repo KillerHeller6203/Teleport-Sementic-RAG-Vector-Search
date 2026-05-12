@@ -1,10 +1,3 @@
-"""
-Tests for the benchmarking sub-package.
-
-Covers the evaluator (MRR, context precision) and the reporter
-(JSON validity, markdown section presence).
-"""
-
 from __future__ import annotations
 
 import json
@@ -15,7 +8,6 @@ from src.benchmarking.reporter import BenchmarkReporter
 
 
 def _make_benchmark_results() -> tuple[list[BenchmarkResult], list[dict]]:
-    """Helper — build sample benchmark results and ground truth."""
     results_a = BenchmarkResult(
         query="How does the system handle peak load?",
         strategy="A",
@@ -47,7 +39,6 @@ def _make_benchmark_results() -> tuple[list[BenchmarkResult], list[dict]]:
 
 
 class TestEvaluator:
-    """Tests for the RAGEvaluator."""
 
     def test_evaluator_computes_mrr(self):
         brs, gt = _make_benchmark_results()
@@ -72,7 +63,6 @@ class TestEvaluator:
 
 
 class TestReporter:
-    """Tests for the BenchmarkReporter."""
 
     def test_reporter_generates_valid_json(self):
         brs, gt = _make_benchmark_results()
@@ -82,7 +72,6 @@ class TestReporter:
         reporter = BenchmarkReporter()
         json_str = reporter.generate_json(eval_results, brs)
 
-        # Must be valid JSON
         parsed = json.loads(json_str)
         assert "evaluation_metrics" in parsed
         assert "benchmark_details" in parsed

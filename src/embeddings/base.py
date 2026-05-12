@@ -6,7 +6,6 @@ import numpy as np
 
 
 class BaseEmbedder(ABC):
-    """All embedders must return L2-normalized vectors."""
 
     @abstractmethod
     def embed(self, texts: list[str]) -> np.ndarray:

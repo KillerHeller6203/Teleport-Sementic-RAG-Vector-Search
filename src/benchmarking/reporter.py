@@ -12,7 +12,6 @@ logger = logging.getLogger(__name__)
 
 
 class BenchmarkReporter:
-    """Generates markdown and JSON benchmark reports."""
 
     def generate_json(
         self,

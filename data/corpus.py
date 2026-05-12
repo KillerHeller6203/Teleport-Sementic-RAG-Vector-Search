@@ -1,11 +1,3 @@
-"""
-Corpus data module.
-
-Defines the document corpus used for embedding and retrieval benchmarking.
-Contains 10 technical paragraphs on distributed systems and infrastructure
-engineering, plus ground-truth relevance judgments for evaluation queries.
-"""
-
 DOCUMENTS = [
     {
         "id": "doc_01",

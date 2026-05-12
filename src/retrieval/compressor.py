@@ -16,7 +16,6 @@ def _split_sentences(text):
 
 
 class ContextualCompressor:
-    """Drops low-relevance sentences from retrieved chunks."""
 
     def __init__(self, embedder: BaseEmbedder) -> None:
         self._embedder = embedder
@@ -57,7 +56,6 @@ class ContextualCompressor:
 
 
 def lost_in_middle_reorder(results: list[SearchResult]) -> list[SearchResult]:
-    """Put best chunks at start and end where LLMs pay most attention."""
     if len(results) <= 2:
         return results
 

@@ -14,7 +14,6 @@ logger = logging.getLogger(__name__)
 
 
 class StrategyA(BaseRetriever):
-    """Baseline — direct embed and search, no preprocessing."""
 
     def __init__(self, embedder: BaseEmbedder, store: BaseVectorStore) -> None:
         self._embedder = embedder
@@ -25,7 +24,6 @@ class StrategyA(BaseRetriever):
         return self._store.search(q_vec, top_k)
 
     def hybrid_retrieve(self, query: str, top_k: int = 3) -> list[SearchResult]:
-        """BM25 + dense cosine fusion. Bit experimental but works ok."""
         all_ids = list(self._store._idx_to_id)
         all_meta = [self._store._metadata[doc_id] for doc_id in all_ids]
 

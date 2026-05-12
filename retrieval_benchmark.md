@@ -4,7 +4,7 @@
 
 This benchmark evaluated **3 queries** across two retrieval strategies.
 
-**Average latency** — Strategy A: 12.6 ms avg; Strategy B: 194.5 ms avg; Strategy HYDE: 101.9 ms avg.
+**Average latency** — Strategy A: 46.2 ms avg; Strategy B: 433.5 ms avg; Strategy HYDE: 284.9 ms avg.
 
 **Average MRR** — Strategy A: 1.0000; Strategy B: 1.0000; Strategy HYDE: 1.0000.
 
@@ -12,7 +12,7 @@ This benchmark evaluated **3 queries** across two retrieval strategies.
 
 ### Strategy A
 
-- **Latency:** 15.99 ms
+- **Latency:** 47.61 ms
 
 |   Rank | Chunk ID       | Source Doc   |   Score | Text Preview                                                                      |
 |--------|----------------|--------------|---------|-----------------------------------------------------------------------------------|
@@ -22,7 +22,7 @@ This benchmark evaluated **3 queries** across two retrieval strategies.
 
 ### Strategy B
 
-- **Latency:** 244.60 ms
+- **Latency:** 458.15 ms
 - **Expanded query:** traffic surge, demand spike, high throughput, capacity planning, horizontal scaling
 
 |   Rank | Chunk ID       | Source Doc   |    Score | Text Preview                                                                      |
@@ -33,7 +33,7 @@ This benchmark evaluated **3 queries** across two retrieval strategies.
 
 ### Strategy HYDE
 
-- **Latency:** 101.81 ms
+- **Latency:** 331.80 ms
 - **Expanded query:** traffic surge, demand spike, high throughput, capacity planning, horizontal scaling
 
 |   Rank | Chunk ID       | Source Doc   |   Score | Text Preview                                                                      |
@@ -54,13 +54,13 @@ This benchmark evaluated **3 queries** across two retrieval strategies.
 
 #### Analysis
 
-Strategy A returned the most relevant document at rank 1 with context precision 1.00 and recall 0.50 (latency 16.0 ms). Strategy B returned the most relevant document at rank 1 with context precision 1.00 and recall 0.75 (latency 244.6 ms). Strategy HYDE returned the most relevant document at rank 1 with context precision 0.67 and recall 0.25 (latency 101.8 ms).
+Strategy A returned the most relevant document at rank 1 with context precision 1.00 and recall 0.50 (latency 47.6 ms). Strategy B returned the most relevant document at rank 1 with context precision 1.00 and recall 0.75 (latency 458.1 ms). Strategy HYDE returned the most relevant document at rank 1 with context precision 0.67 and recall 0.25 (latency 331.8 ms).
 
 ## Query: *What strategies are used for caching?*
 
 ### Strategy A
 
-- **Latency:** 10.34 ms
+- **Latency:** 51.32 ms
 
 |   Rank | Chunk ID       | Source Doc   |   Score | Text Preview                                                                      |
 |--------|----------------|--------------|---------|-----------------------------------------------------------------------------------|
@@ -70,7 +70,7 @@ Strategy A returned the most relevant document at rank 1 with context precision 
 
 ### Strategy B
 
-- **Latency:** 166.26 ms
+- **Latency:** 434.96 ms
 - **Expanded query:** distributed cache, Redis, Memcached, cache-aside, write-through, TTL expiration
 
 |   Rank | Chunk ID       | Source Doc   |    Score | Text Preview                                                                      |
@@ -81,7 +81,7 @@ Strategy A returned the most relevant document at rank 1 with context precision 
 
 ### Strategy HYDE
 
-- **Latency:** 104.44 ms
+- **Latency:** 260.15 ms
 - **Expanded query:** distributed cache, Redis, Memcached, cache-aside, write-through, TTL expiration
 
 |   Rank | Chunk ID       | Source Doc   |    Score | Text Preview                                                                      |
@@ -102,13 +102,13 @@ Strategy A returned the most relevant document at rank 1 with context precision 
 
 #### Analysis
 
-Strategy A returned the most relevant document at rank 1 with context precision 1.00 and recall 0.50 (latency 10.3 ms). Strategy B returned the most relevant document at rank 1 with context precision 0.67 and recall 0.50 (latency 166.3 ms). Strategy HYDE returned the most relevant document at rank 1 with context precision 0.67 and recall 0.50 (latency 104.4 ms).
+Strategy A returned the most relevant document at rank 1 with context precision 1.00 and recall 0.50 (latency 51.3 ms). Strategy B returned the most relevant document at rank 1 with context precision 0.67 and recall 0.50 (latency 435.0 ms). Strategy HYDE returned the most relevant document at rank 1 with context precision 0.67 and recall 0.50 (latency 260.1 ms).
 
 ## Query: *How are failures detected and recovered?*
 
 ### Strategy A
 
-- **Latency:** 11.36 ms
+- **Latency:** 39.65 ms
 
 |   Rank | Chunk ID       | Source Doc   |   Score | Text Preview                                                                      |
 |--------|----------------|--------------|---------|-----------------------------------------------------------------------------------|
@@ -118,7 +118,7 @@ Strategy A returned the most relevant document at rank 1 with context precision 
 
 ### Strategy B
 
-- **Latency:** 172.58 ms
+- **Latency:** 407.35 ms
 - **Expanded query:** fault tolerance, circuit breaker, failover, degradation, resilience, recovery
 
 |   Rank | Chunk ID       | Source Doc   |    Score | Text Preview                                                                      |
@@ -129,7 +129,7 @@ Strategy A returned the most relevant document at rank 1 with context precision 
 
 ### Strategy HYDE
 
-- **Latency:** 99.57 ms
+- **Latency:** 262.87 ms
 - **Expanded query:** fault tolerance, circuit breaker, failover, degradation, resilience, recovery
 
 |   Rank | Chunk ID       | Source Doc   |   Score | Text Preview                                                                      |
@@ -150,7 +150,7 @@ Strategy A returned the most relevant document at rank 1 with context precision 
 
 #### Analysis
 
-Strategy A returned the most relevant document at rank 1 with context precision 1.00 and recall 0.33 (latency 11.4 ms). Strategy B returned the most relevant document at rank 1 with context precision 1.00 and recall 0.67 (latency 172.6 ms). Strategy HYDE returned the most relevant document at rank 1 with context precision 1.00 and recall 0.33 (latency 99.6 ms).
+Strategy A returned the most relevant document at rank 1 with context precision 1.00 and recall 0.33 (latency 39.6 ms). Strategy B returned the most relevant document at rank 1 with context precision 1.00 and recall 0.67 (latency 407.4 ms). Strategy HYDE returned the most relevant document at rank 1 with context precision 1.00 and recall 0.33 (latency 262.9 ms).
 
 ## Aggregate Metrics Comparison
 

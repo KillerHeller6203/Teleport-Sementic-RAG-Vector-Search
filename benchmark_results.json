@@ -1,0 +1,345 @@
+{
+  "evaluation_metrics": {
+    "How does the system handle peak load?": {
+      "A": {
+        "hit_at_k": true,
+        "mrr": 1.0,
+        "context_precision": 1.0,
+        "context_recall": 0.5,
+        "faithfulness": 0.85,
+        "answer_relevancy": 0.8
+      },
+      "B": {
+        "hit_at_k": true,
+        "mrr": 1.0,
+        "context_precision": 1.0,
+        "context_recall": 0.75,
+        "faithfulness": 0.85,
+        "answer_relevancy": 0.8
+      },
+      "HYDE": {
+        "hit_at_k": true,
+        "mrr": 1.0,
+        "context_precision": 0.6667,
+        "context_recall": 0.25,
+        "faithfulness": 0.85,
+        "answer_relevancy": 0.8
+      }
+    },
+    "What strategies are used for caching?": {
+      "A": {
+        "hit_at_k": true,
+        "mrr": 1.0,
+        "context_precision": 1.0,
+        "context_recall": 0.5,
+        "faithfulness": 0.85,
+        "answer_relevancy": 0.8
+      },
+      "B": {
+        "hit_at_k": true,
+        "mrr": 1.0,
+        "context_precision": 0.6667,
+        "context_recall": 0.5,
+        "faithfulness": 0.85,
+        "answer_relevancy": 0.8
+      },
+      "HYDE": {
+        "hit_at_k": true,
+        "mrr": 1.0,
+        "context_precision": 0.6667,
+        "context_recall": 0.5,
+        "faithfulness": 0.85,
+        "answer_relevancy": 0.8
+      }
+    },
+    "How are failures detected and recovered?": {
+      "A": {
+        "hit_at_k": true,
+        "mrr": 1.0,
+        "context_precision": 1.0,
+        "context_recall": 0.3333,
+        "faithfulness": 0.85,
+        "answer_relevancy": 0.8
+      },
+      "B": {
+        "hit_at_k": true,
+        "mrr": 1.0,
+        "context_precision": 1.0,
+        "context_recall": 0.6667,
+        "faithfulness": 0.85,
+        "answer_relevancy": 0.8
+      },
+      "HYDE": {
+        "hit_at_k": true,
+        "mrr": 1.0,
+        "context_precision": 1.0,
+        "context_recall": 0.3333,
+        "faithfulness": 0.85,
+        "answer_relevancy": 0.8
+      }
+    }
+  },
+  "benchmark_details": [
+    {
+      "query": "How does the system handle peak load?",
+      "strategy": "A",
+      "latency_ms": 47.61,
+      "expanded_query": null,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "doc_02_chunk_3",
+          "source_doc_id": "doc_02",
+          "score": 0.6,
+          "text_preview": "before anticipated demand surges Cool-down periods prevent thrashing by enforcing a minimum interval between consecutive"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "doc_01_chunk_1",
+          "source_doc_id": "doc_01",
+          "score": 0.5469,
+          "text_preview": "low latency during demand surges When peak load exceeds the capacity of a single node, the orchestration layer provision"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "doc_02_chunk_4",
+          "source_doc_id": "doc_02",
+          "score": 0.438,
+          "text_preview": "ween consecutive scaling actions Well-tuned policies strike a balance between cost efficiency and availability, ensuring"
+        }
+      ]
+    },
+    {
+      "query": "How does the system handle peak load?",
+      "strategy": "B",
+      "latency_ms": 458.15,
+      "expanded_query": "traffic surge, demand spike, high throughput, capacity planning, horizontal scaling",
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "doc_01_chunk_1",
+          "source_doc_id": "doc_01",
+          "score": 0.6325,
+          "text_preview": "low latency during demand surges When peak load exceeds the capacity of a single node, the orchestration layer provision"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "doc_02_chunk_3",
+          "source_doc_id": "doc_02",
+          "score": -11.0155,
+          "text_preview": "before anticipated demand surges Cool-down periods prevent thrashing by enforcing a minimum interval between consecutive"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "doc_10_chunk_0",
+          "source_doc_id": "doc_10",
+          "score": -10.7069,
+          "text_preview": "Effective monitoring during traffic spikes relies on real-time dashboards that surface the four golden signals: latency,"
+        }
+      ]
+    },
+    {
+      "query": "How does the system handle peak load?",
+      "strategy": "HYDE",
+      "latency_ms": 331.8,
+      "expanded_query": "traffic surge, demand spike, high throughput, capacity planning, horizontal scaling",
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "doc_01_chunk_1",
+          "source_doc_id": "doc_01",
+          "score": 0.6325,
+          "text_preview": "low latency during demand surges When peak load exceeds the capacity of a single node, the orchestration layer provision"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "doc_03_chunk_4",
+          "source_doc_id": "doc_03",
+          "score": -9.7893,
+          "text_preview": "even in multi-region deployments Throttling acts as a safety valve that gracefully degrades throughput rather than allow"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "doc_01_chunk_4",
+          "source_doc_id": "doc_01",
+          "score": -9.4622,
+          "text_preview": "on crosses predefined thresholds The elasticity of horizontal expansion allows the cluster to absorb sudden traffic spik"
+        }
+      ]
+    },
+    {
+      "query": "What strategies are used for caching?",
+      "strategy": "A",
+      "latency_ms": 51.32,
+      "expanded_query": null,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "doc_04_chunk_0",
+          "source_doc_id": "doc_04",
+          "score": 0.5776,
+          "text_preview": "Distributed caches such as Redis and Memcached store frequently accessed data in memory, drastically reducing read laten"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "doc_04_chunk_1",
+          "source_doc_id": "doc_04",
+          "score": 0.5703,
+          "text_preview": "ueries from the primary database A cache-aside pattern lets the application check the cache first and fall back to the d"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "doc_04_chunk_2",
+          "source_doc_id": "doc_04",
+          "score": 0.5058,
+          "text_preview": "ult back for subsequent requests Write-through and write-behind strategies push updates into the cache at write time, tr"
+        }
+      ]
+    },
+    {
+      "query": "What strategies are used for caching?",
+      "strategy": "B",
+      "latency_ms": 434.96,
+      "expanded_query": "distributed cache, Redis, Memcached, cache-aside, write-through, TTL expiration",
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "doc_04_chunk_4",
+          "source_doc_id": "doc_04",
+          "score": -10.6048,
+          "text_preview": "ribution when the cluster scales Time-to-live expiration policies and active invalidation hooks prevent stale data from "
+        },
+        {
+          "rank": 2,
+          "chunk_id": "doc_09_chunk_2",
+          "source_doc_id": "doc_09",
+          "score": -11.229,
+          "text_preview": "heterogeneous processing speeds IP-hash deterministically maps a client address to a specific backend, providing session"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "doc_04_chunk_0",
+          "source_doc_id": "doc_04",
+          "score": -10.9487,
+          "text_preview": "Distributed caches such as Redis and Memcached store frequently accessed data in memory, drastically reducing read laten"
+        }
+      ]
+    },
+    {
+      "query": "What strategies are used for caching?",
+      "strategy": "HYDE",
+      "latency_ms": 260.15,
+      "expanded_query": "distributed cache, Redis, Memcached, cache-aside, write-through, TTL expiration",
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "doc_04_chunk_2",
+          "source_doc_id": "doc_04",
+          "score": -9.0048,
+          "text_preview": "ult back for subsequent requests Write-through and write-behind strategies push updates into the cache at write time, tr"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "doc_04_chunk_3",
+          "source_doc_id": "doc_04",
+          "score": -10.5433,
+          "text_preview": "cy for stronger read consistency Consistent hashing distributes keys evenly across cache nodes and minimizes key redistr"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "doc_08_chunk_1",
+          "source_doc_id": "doc_08",
+          "score": -10.5364,
+          "text_preview": "ation round-trip for every query Under high concurrency, an undersized pool forces incoming requests to queue, inflating"
+        }
+      ]
+    },
+    {
+      "query": "How are failures detected and recovered?",
+      "strategy": "A",
+      "latency_ms": 39.65,
+      "expanded_query": null,
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "doc_05_chunk_0",
+          "source_doc_id": "doc_05",
+          "score": 0.3798,
+          "text_preview": "The circuit breaker pattern monitors outbound calls to a dependency and trips open when the failure rate exceeds a thres"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "doc_05_chunk_2",
+          "source_doc_id": "doc_05",
+          "score": 0.3622,
+          "text_preview": "eing overwhelmed by retry storms After a configurable timeout the breaker transitions to half-open, allowing a limited p"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "doc_05_chunk_3",
+          "source_doc_id": "doc_05",
+          "score": 0.3471,
+          "text_preview": "e dependency has regained health Successful probes reset the breaker to the closed state and restore normal traffic flow"
+        }
+      ]
+    },
+    {
+      "query": "How are failures detected and recovered?",
+      "strategy": "B",
+      "latency_ms": 407.35,
+      "expanded_query": "fault tolerance, circuit breaker, failover, degradation, resilience, recovery",
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "doc_05_chunk_0",
+          "source_doc_id": "doc_05",
+          "score": -7.1859,
+          "text_preview": "The circuit breaker pattern monitors outbound calls to a dependency and trips open when the failure rate exceeds a thres"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "doc_10_chunk_2",
+          "source_doc_id": "doc_10",
+          "score": -10.759,
+          "text_preview": "tching genuine degradation early Distributed tracing with OpenTelemetry correlates individual requests across service bo"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "doc_05_chunk_4",
+          "source_doc_id": "doc_05",
+          "score": -8.2292,
+          "text_preview": "and restore normal traffic flow Libraries like Hystrix, Resilience4j, and Polly provide production-grade implementations"
+        }
+      ]
+    },
+    {
+      "query": "How are failures detected and recovered?",
+      "strategy": "HYDE",
+      "latency_ms": 262.87,
+      "expanded_query": "fault tolerance, circuit breaker, failover, degradation, resilience, recovery",
+      "results": [
+        {
+          "rank": 1,
+          "chunk_id": "doc_05_chunk_0",
+          "source_doc_id": "doc_05",
+          "score": -7.1859,
+          "text_preview": "The circuit breaker pattern monitors outbound calls to a dependency and trips open when the failure rate exceeds a thres"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "doc_05_chunk_1",
+          "source_doc_id": "doc_05",
+          "score": -8.933,
+          "text_preview": "equests with a fallback response In the open state, no traffic is forwarded to the degraded downstream, giving it time t"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "doc_05_chunk_4",
+          "source_doc_id": "doc_05",
+          "score": -8.2292,
+          "text_preview": "and restore normal traffic flow Libraries like Hystrix, Resilience4j, and Polly provide production-grade implementations"
+        }
+      ]
+    }
+  ]
+}

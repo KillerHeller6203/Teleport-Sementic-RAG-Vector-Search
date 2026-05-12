@@ -1,11 +1,3 @@
-"""
-Tests for the pipeline sub-package.
-
-Covers the ingestion pipeline (document loading, chunking, embedding, and
-indexing) and the RAG engine (end-to-end query processing through retrieval,
-reranking, and compression stages).
-"""
-
 from __future__ import annotations
 
 from config import BenchmarkResult, SearchResult
@@ -13,7 +5,6 @@ from src.pipeline.ingestion import DocumentChunker, IngestionPipeline
 
 
 class TestIngestion:
-    """Tests for DocumentChunker and IngestionPipeline."""
 
     def test_ingestion_creates_chunks(self):
         chunker = DocumentChunker(chunk_size=100, chunk_overlap=20)
@@ -53,7 +44,6 @@ class TestIngestion:
 
 
 class TestRAGEngine:
-    """Tests for the RAG engine orchestrator."""
 
     def test_rag_engine_ingest_then_retrieve_strategy_a(
         self, embedder, sample_documents

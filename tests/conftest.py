@@ -1,11 +1,3 @@
-"""
-Shared pytest fixtures and configuration for the test suite.
-
-Provides reusable fixtures such as sample documents, pre-built embedding
-vectors, a temporary FAISS index, and mock embedding providers used across
-all test modules.
-"""
-
 from __future__ import annotations
 
 import sys
@@ -14,9 +6,6 @@ from unittest.mock import MagicMock, patch
 import numpy as np
 import pytest
 
-# ---------------------------------------------------------------------------
-# Ensure project root is on sys.path
-# ---------------------------------------------------------------------------
 sys.path.insert(0, ".")
 
 from config import EMBEDDING_DIM, SearchResult
@@ -24,11 +13,6 @@ from src.embeddings.base import BaseEmbedder
 from src.embeddings.vertex_mock import MockGenerativeModel
 from src.retrieval.query_expander import QueryExpander
 from src.storage.faiss_store import FAISSVectorStore
-
-
-# =========================================================================
-# Lightweight mock embedder (avoids loading a real transformer model)
-# =========================================================================
 
 class _MockLocalEmbedder(BaseEmbedder):
     """Deterministic embedder for tests — no real model download."""
@@ -46,10 +30,6 @@ class _MockLocalEmbedder(BaseEmbedder):
     def embed_query(self, query: str) -> np.ndarray:
         return self.embed([query])[0]
 
-
-# =========================================================================
-# Fixtures
-# =========================================================================
 
 @pytest.fixture()
 def sample_documents() -> list[dict]:
@@ -131,7 +111,6 @@ def rag_engine(
     from src.pipeline.rag_engine import RAGEngine
     from src.retrieval.compressor import ContextualCompressor
 
-    # Mock the CrossEncoderReranker to avoid loading a real model
     mock_reranker = MagicMock()
     mock_reranker.rerank = MagicMock(
         side_effect=lambda query, results: results

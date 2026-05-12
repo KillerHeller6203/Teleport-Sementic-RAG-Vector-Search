@@ -1,11 +1,3 @@
-"""
-Tests for the embeddings sub-package.
-
-Covers the mock local embedder, the Vertex AI mock provider,
-dimensionality consistency, batch encoding correctness, and adherence to the
-base embedding interface.
-"""
-
 from __future__ import annotations
 
 import numpy as np
@@ -15,7 +7,6 @@ from src.embeddings.vertex_mock import MockGenerativeModel, MockVertexEmbeddingM
 
 
 class TestEmbedder:
-    """Tests for BaseEmbedder implementations."""
 
     def test_embed_returns_correct_shape(self, embedder):
         texts = ["hello world", "foo bar", "test document"]
@@ -35,7 +26,6 @@ class TestEmbedder:
 
 
 class TestVertexMock:
-    """Tests for the Vertex AI mock classes."""
 
     def test_vertex_mock_returns_values_attribute(self, embedder):
         mock_model = MockVertexEmbeddingModel(underlying_embedder=embedder)
@@ -49,6 +39,5 @@ class TestVertexMock:
         model = MockGenerativeModel()
         query = "peak load"
         response = model.generate_content(query)
-        # Expanded output should be longer than the original query
         assert len(response.text) > len(query)
-        assert "," in response.text  # comma-separated terms
+        assert "," in response.text 

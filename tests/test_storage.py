@@ -1,11 +1,3 @@
-"""
-Tests for the storage sub-package.
-
-Covers FAISS index creation, vector insertion, k-NN search accuracy,
-index serialization / deserialization, and edge cases such as empty
-indexes and dimension mismatches.
-"""
-
 from __future__ import annotations
 
 import numpy as np
@@ -16,7 +8,6 @@ from src.storage.faiss_store import FAISSVectorStore
 
 
 class TestFAISSVectorStore:
-    """Tests for FAISSVectorStore."""
 
     def test_add_and_count(self, embedder, vector_store):
         texts = ["document one", "document two"]

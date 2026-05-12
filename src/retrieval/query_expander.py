@@ -4,7 +4,6 @@ from src.embeddings.vertex_mock import MockGenerativeModel
 
 
 class QueryExpander:
-    """Expands a query into related terms using the generative model."""
 
     _PROMPT_TEMPLATE = (
         "Rewrite and expand this search query into a comma-separated "

@@ -10,7 +10,6 @@ logger = logging.getLogger(__name__)
 
 
 class CrossEncoderReranker:
-    """Rescores results using a cross-encoder for better accuracy."""
 
     def __init__(self, model_name: str | None = None) -> None:
         self._model_name = model_name or RERANKER_MODEL

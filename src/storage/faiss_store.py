@@ -14,7 +14,6 @@ logger = logging.getLogger(__name__)
 
 
 class FAISSVectorStore(BaseVectorStore):
-    """FAISS IndexFlatIP backed store. Expects L2-normalized vectors."""
 
     def __init__(self, dim: int = EMBEDDING_DIM) -> None:
         self._dim = dim

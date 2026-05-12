@@ -6,7 +6,6 @@ from config import BenchmarkResult
 
 
 class RAGEvaluator:
-    """Scores retrieval results against ground truth relevance labels."""
 
     _MOCK_FAITHFULNESS = 0.85
     _MOCK_ANSWER_RELEVANCY = 0.80

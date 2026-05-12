@@ -18,7 +18,6 @@ def _l2_normalize(vectors: np.ndarray) -> np.ndarray:
 
 
 class LocalEmbedder(BaseEmbedder):
-    """Wraps a sentence-transformer model for local embedding."""
 
     def __init__(self, model_name: str | None = None) -> None:
         self._model_name = model_name or EMBEDDING_MODEL

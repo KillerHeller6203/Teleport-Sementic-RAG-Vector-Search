@@ -1,11 +1,3 @@
-"""
-Application configuration module.
-
-Centralizes all configuration settings including environment variable loading,
-model parameters, FAISS index paths, retrieval hyperparameters, and logging
-configuration. Uses python-dotenv for environment management.
-"""
-
 from __future__ import annotations
 
 import os
@@ -40,7 +32,6 @@ LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
 
 @dataclass
 class SearchResult:
-    """A single retrieval hit returned by a search strategy."""
 
     chunk_id: str
     text: str
@@ -51,7 +42,6 @@ class SearchResult:
 
 @dataclass
 class BenchmarkResult:
-    """Aggregated output from running a single query through a strategy."""
 
     query: str
     strategy: str
@@ -63,7 +53,6 @@ class BenchmarkResult:
 
 @dataclass
 class RAGASScores:
-    """RAGAS evaluation scores for a retrieval run."""
 
     faithfulness: float = 0.0
     answer_relevancy: float = 0.0

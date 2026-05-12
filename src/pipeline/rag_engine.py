@@ -23,7 +23,6 @@ logger = logging.getLogger(__name__)
 
 
 class StageTimer:
-    """Records elapsed ms into a dict. Used as context manager."""
 
     def __init__(self, name, store):
         self.name = name
@@ -40,7 +39,6 @@ class StageTimer:
 
 
 class RAGEngine:
-    """Main orchestrator — ties together ingestion, retrieval, and eval."""
 
     def __init__(
         self,
@@ -153,7 +151,6 @@ class RAGEngine:
         )
 
     def benchmark(self, queries: list[str]) -> list[BenchmarkResult]:
-        """Run each query through A, B, and HyDE."""
         logger.info("Starting benchmark with %d queries...", len(queries))
         all_results = []
 

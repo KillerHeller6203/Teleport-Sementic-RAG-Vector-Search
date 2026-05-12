@@ -1,10 +1,3 @@
-"""
-HyDE — Hypothetical Document Embeddings.
-
-Corpus docs look like answers, not questions. Strategy B fixes the query side.
-HyDE fixes the embedding side — generate a fake answer, embed that instead.
-"""
-
 from __future__ import annotations
 
 import logging
@@ -21,7 +14,6 @@ logger = logging.getLogger(__name__)
 
 
 class HyDERetriever(BaseRetriever):
-    """Embeds hypothetical answers instead of the raw query."""
 
     def __init__(
         self,

@@ -1,11 +1,3 @@
-"""
-Tests for the retrieval sub-package.
-
-Covers Strategy A (vanilla top-k), Strategy B (enhanced pipeline), query
-expansion, MMR diversification, cross-encoder reranking, context compression,
-and comparative assertions between strategies.
-"""
-
 from __future__ import annotations
 
 from unittest.mock import MagicMock, patch
@@ -18,7 +10,6 @@ from src.retrieval.mmr import mmr_rerank
 
 
 class TestStrategyA:
-    """Tests for the baseline retrieval strategy."""
 
     def test_strategy_a_returns_results(self, strategy_a):
         results = strategy_a.retrieve("test query", top_k=2)
@@ -27,7 +18,6 @@ class TestStrategyA:
 
 
 class TestStrategyB:
-    """Tests for the enhanced retrieval strategy."""
 
     def test_strategy_b_returns_results(self, strategy_b):
         results = strategy_b.retrieve(
@@ -46,10 +36,8 @@ class TestStrategyB:
 
 
 class TestMMR:
-    """Tests for Maximal Marginal Relevance reranking."""
 
     def test_mmr_rerank_returns_diverse_results(self, embedder):
-        # Build 5 candidates — some near-duplicates, some diverse
         results = [
             SearchResult(
                 chunk_id=f"c{i}",
@@ -69,20 +57,15 @@ class TestMMR:
             lambda_param=0.5,
         )
         assert len(reranked) == 3
-        # Ranks should be reassigned 1, 2, 3
         assert [r.rank for r in reranked] == [1, 2, 3]
-        # All returned chunk_ids should be from the original set
         original_ids = {r.chunk_id for r in results}
         assert all(r.chunk_id in original_ids for r in reranked)
 
 
 class TestReranker:
-    """Tests for the cross-encoder reranker (mocked)."""
 
     def test_reranker_changes_order(self):
-        # Mock CrossEncoder to return reversed scores
         mock_ce = MagicMock()
-        # 3 results → predict returns scores that reverse the order
         mock_ce.predict.return_value = [0.1, 0.5, 0.9]
 
         with patch(
@@ -110,7 +93,6 @@ class TestReranker:
 
 
 class TestCompressor:
-    """Tests for contextual compression."""
 
     def test_compressor_reduces_text_length(self, embedder):
         compressor = ContextualCompressor(embedder=embedder)
@@ -132,6 +114,4 @@ class TestCompressor:
         ]
         compressed = compressor.compress("scaling and auto-scaling", results)
         assert len(compressed) == 1
-        # Compressed text should be no longer than original
-        # (may be equal if all sentences pass the threshold)
         assert len(compressed[0].text) <= len(long_text)
