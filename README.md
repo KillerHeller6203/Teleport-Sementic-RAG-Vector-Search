@@ -83,7 +83,7 @@ rag-vector-search/
 ## Quick Start
 
 ```bash
-git clone <repo-url>
+git clone <https://github.com/KillerHeller6203/Teleport-Sementic-RAG-Vector-Search>
 cd rag-vector-search
 pip install -e .
 python main.py
