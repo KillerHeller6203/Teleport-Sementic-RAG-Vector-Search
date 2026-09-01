@@ -79,16 +79,17 @@
   }
 
   .brand-icon {
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
     background: var(--accent-green);
     border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: #000;
+    font-family: var(--font-mono);
     font-weight: 900;
-    font-size: 14px;
+    font-size: 11px;
     box-shadow: 0 0 10px var(--accent-green-dim);
     animation: pulseIcon 3s infinite alternate;
   }
@@ -502,7 +503,8 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-weight: 900;
+    font-weight: 700;
+    font-size: 16px;
   }
 
   .doc-modal-close:hover {
@@ -650,7 +652,7 @@
           <div style="font-family:var(--font-mono);font-size:11px;color:var(--accent-green)" id="modalDocId">DOC_01</div>
           <div class="doc-modal-title" id="modalDocTitle">Document Title</div>
         </div>
-        <div class="doc-modal-close" onclick="closeDocModal()">✕</div>
+        <div class="doc-modal-close" onclick="closeDocModal()">&times;</div>
       </div>
       <div class="doc-modal-body">
         <div>
@@ -669,7 +671,7 @@
   <div class="navbar">
     <div class="nav-left">
       <div class="brand" onclick="switchPane('overview')">
-        <div class="brand-icon">⚡</div>
+        <div class="brand-icon">RAG</div>
         sementic-rag-vector-search
       </div>
       <div class="nav-tabs">
@@ -684,8 +686,8 @@
         <div class="status-dot"></div>
         FAISS INDEX ONLINE
       </div>
-      <button class="nav-btn" onclick="runBenchmarkAnimation()">▶ RUN TEST</button>
-      <button class="nav-btn" onclick="exportResults()">💾 EXPORT JSON</button>
+      <button class="nav-btn" onclick="runBenchmarkAnimation()">RUN TEST</button>
+      <button class="nav-btn" onclick="exportResults()">EXPORT JSON</button>
     </div>
   </div>
 
@@ -824,19 +826,19 @@
               <div style="font-weight:700;color:#fff;margin-top:4px">QUERY EXPANSION</div>
               <div style="font-size:10px;color:var(--text-muted);margin-top:2px" id="flow-stage-1">MockGenerativeModel</div>
             </div>
-            <div class="flow-arrow">➔</div>
+            <div class="flow-arrow">&rarr;</div>
             <div class="flow-step">
               <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent-blue)">STAGE 2</div>
               <div style="font-weight:700;color:#fff;margin-top:4px">FAISS SEARCH</div>
               <div style="font-size:10px;color:var(--text-muted);margin-top:2px">IndexFlatIP (Cosine)</div>
             </div>
-            <div class="flow-arrow">➔</div>
+            <div class="flow-arrow">&rarr;</div>
             <div class="flow-step">
               <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent-yellow)">STAGE 3</div>
               <div style="font-weight:700;color:#fff;margin-top:4px">CROSS-ENCODER</div>
               <div style="font-size:10px;color:var(--text-muted);margin-top:2px">ms-marco-MiniLM-L6</div>
             </div>
-            <div class="flow-arrow">➔</div>
+            <div class="flow-arrow">&rarr;</div>
             <div class="flow-step">
               <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent-purple)">STAGE 4</div>
               <div style="font-weight:700;color:#fff;margin-top:4px">LOST-IN-MIDDLE</div>
@@ -868,7 +870,7 @@
 
     <!-- RIGHT INSPECTOR PANEL -->
     <div class="inspector">
-      <div class="inspector-header-cap">OBJECT BROWSER ▲</div>
+      <div class="inspector-header-cap">OBJECT BROWSER &blacktrianglesmall;</div>
       <div class="inspector-search">
         <input type="text" class="search-input" placeholder="Search Query / Chunk ID..." onkeyup="filterTree(this.value)" />
       </div>
@@ -1044,7 +1046,7 @@ function renderCorpus() {
       <div class="corpus-card" onclick="openDocModal(${idx})">
         <div class="corpus-id">
           <span>${doc.id}</span>
-          <span style="font-size:10px;color:var(--text-muted)">CLICK TO OPEN 🔍</span>
+          <span style="font-size:10px;color:var(--text-muted)">CLICK TO OPEN</span>
         </div>
         <div class="corpus-title">${doc.title}</div>
         <div class="corpus-text">${doc.text.slice(0, 120)}...</div>
@@ -1059,11 +1061,9 @@ function openDocModal(docIndex) {
   document.getElementById('modalDocTitle').innerText = doc.title;
   document.getElementById('modalDocText').innerText = doc.text;
 
-  // Generate chunks breakdown
   const chunkBox = document.getElementById('modalChunkBox');
   chunkBox.innerHTML = '';
   
-  // Create simulated 256-char chunks
   const words = doc.text.split(' ');
   let currentChunk = [];
   let chunkIdx = 0;
@@ -1091,7 +1091,6 @@ function openDocModal(docIndex) {
     `;
   }
 
-  // Update Right Inspector Panel with Document details
   document.getElementById('propQuery').innerText = doc.title;
   document.getElementById('propStrat').innerText = `Corpus Entry (${doc.id})`;
   document.getElementById('propLat').innerText = `N/A (Indexed)`;
@@ -1106,7 +1105,6 @@ function closeDocModal() {
   document.getElementById('docModalOverlay').style.display = 'none';
 }
 
-// Close modal on overlay click
 document.getElementById('docModalOverlay').addEventListener('click', function(e) {
   if (e.target === this) closeDocModal();
 });
@@ -1120,7 +1118,10 @@ function buildTree() {
     const badgeClass = d.strategy === 'A' ? 'badge-a' : (d.strategy === 'B' ? 'badge-b' : 'badge-hyde');
     container.innerHTML += `
       <div class="tree-item ${isSelected}" onclick="selectObject(${idx}, this)">
-        <div class="tree-item-title"><span>⚡</span><span>${d.query.slice(0, 22)}...</span></div>
+        <div class="tree-item-title">
+          <span style="font-family:var(--font-mono);font-size:10px;color:var(--accent-blue)">[Q]</span>
+          <span>${d.query.slice(0, 22)}...</span>
+        </div>
         <span class="tree-item-badge ${badgeClass}">STRAT ${d.strategy}</span>
       </div>
     `;
