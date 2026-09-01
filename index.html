@@ -412,18 +412,23 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    transition: all 0.2s ease;
+    cursor: pointer;
+    transition: all 0.25s ease;
   }
 
   .corpus-card:hover {
-    border-color: var(--accent-blue);
-    transform: translateY(-2px);
+    border-color: var(--accent-green);
+    transform: translateY(-3px);
+    box-shadow: 0 0 15px var(--accent-green-dim);
   }
 
   .corpus-id {
     font-family: var(--font-mono);
     font-size: 11px;
     color: var(--accent-green);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
   .corpus-title {
@@ -437,6 +442,111 @@
     font-size: 11.5px;
     color: var(--text-muted);
     line-height: 1.5;
+  }
+
+  /* DOCUMENT MODAL */
+  .doc-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 14, 26, 0.85);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(8px);
+  }
+
+  .doc-modal-card {
+    width: 680px;
+    max-width: 90vw;
+    max-height: 85vh;
+    background: var(--bg-card);
+    border: 1px solid var(--accent-green);
+    border-radius: 12px;
+    box-shadow: 0 0 30px var(--accent-green-dim);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: modalPop 0.3s ease;
+  }
+
+  @keyframes modalPop {
+    0% { transform: scale(0.9); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .doc-modal-header {
+    background: var(--bg-panel);
+    border-bottom: 1px solid var(--border-color);
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .doc-modal-title {
+    font-family: var(--font-heading);
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .doc-modal-close {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: 900;
+  }
+
+  .doc-modal-close:hover {
+    color: #fff;
+    border-color: var(--accent-green);
+  }
+
+  .doc-modal-body {
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .doc-full-text {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 14px;
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: var(--text-main);
+  }
+
+  .doc-chunk-box {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .doc-chunk-item {
+    background: rgba(0,0,0,0.25);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 10px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+
+  .doc-chunk-id {
+    color: var(--accent-blue);
+    font-weight: 700;
+    margin-bottom: 4px;
   }
 
   /* --- RIGHT INSPECTOR PANEL --- */
@@ -530,6 +640,29 @@
       <div class="scan-sweep"></div>
     </div>
     <div class="scan-text">INGESTING CORPUS & EXECUTING RETRIEVAL TEST...</div>
+  </div>
+
+  <!-- DOCUMENT READER MODAL -->
+  <div class="doc-modal-overlay" id="docModalOverlay">
+    <div class="doc-modal-card">
+      <div class="doc-modal-header">
+        <div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--accent-green)" id="modalDocId">DOC_01</div>
+          <div class="doc-modal-title" id="modalDocTitle">Document Title</div>
+        </div>
+        <div class="doc-modal-close" onclick="closeDocModal()">✕</div>
+      </div>
+      <div class="doc-modal-body">
+        <div>
+          <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-bottom:4px">FULL DOCUMENT TEXT:</div>
+          <div class="doc-full-text" id="modalDocText">Full document content here...</div>
+        </div>
+        <div>
+          <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-bottom:6px">GENERATED CHUNKS (FAISS INDEXED):</div>
+          <div class="doc-chunk-box" id="modalChunkBox"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- TOP NAVBAR -->
@@ -715,7 +848,7 @@
 
       <!-- PANE 3: DOCUMENT CORPUS -->
       <div class="view-pane" id="pane-corpus">
-        <div class="widget-title">DOCUMENT CORPUS DICTIONARY (10 TECHNICAL DOCS)</div>
+        <div class="widget-title">DOCUMENT CORPUS DICTIONARY (CLICK ANY CARD TO OPEN FULL DOC & CHUNKS)</div>
         <div class="corpus-grid" id="corpusGrid">
           <!-- Injected via JS -->
         </div>
@@ -790,26 +923,24 @@ const DATA = {
 };
 
 const CORPUS = [
-  { id: "doc_01", title: "Horizontal Scaling Under Peak Load", text: "Horizontal scaling distributes incoming traffic across multiple server instances to maintain low latency during demand surges..." },
-  { id: "doc_02", title: "Auto-Scaling Policies and Triggers", text: "Auto-scaling policies define the rules that govern when and how compute resources are added or removed..." },
-  { id: "doc_03", title: "Rate Limiting and Throttling Strategies", text: "Rate limiting controls the volume of requests a client can issue within a given time window..." },
-  { id: "doc_04", title: "Distributed Caching Strategies", text: "Distributed caches such as Redis and Memcached store frequently accessed data in memory..." },
-  { id: "doc_05", title: "Circuit Breaker Pattern for Fault Tolerance", text: "The circuit breaker pattern monitors outbound calls to a dependency and trips open when failure rate exceeds threshold..." },
-  { id: "doc_06", title: "Vector Index Performance and ANN Algorithms", text: "Approximate nearest-neighbor algorithms trade a small amount of recall for speedup over brute-force search..." },
-  { id: "doc_07", title: "Embedding Model Latency and Batching", text: "Transformer-based embedding models incur non-trivial inference latency when encoding long sequences..." },
-  { id: "doc_08", title: "Database Connection Pooling Under High Concurrency", text: "Connection pooling maintains a reusable set of database connections..." },
-  { id: "doc_09", title: "Load Balancer Algorithms", text: "Load balancers distribute inbound requests across a pool of backend servers..." },
-  { id: "doc_10", title: "Monitoring and Alerting During Traffic Spikes", text: "Effective monitoring during traffic spikes relies on real-time dashboards surfacing four golden signals..." }
+  { id: "doc_01", title: "Horizontal Scaling Under Peak Load", text: "Horizontal scaling distributes incoming traffic across multiple server instances to maintain low latency during demand surges. When peak load exceeds the capacity of a single node, the orchestration layer provisions additional replicas behind the load balancer within seconds. Stateless service design is a prerequisite, because each replica must handle any request without relying on local session state. Container orchestrators such as Kubernetes track CPU and memory pressure per pod and emit scaling events when utilization crosses predefined thresholds. The elasticity of horizontal expansion allows the cluster to absorb sudden traffic spikes—like flash sales or viral events—without degrading response times for end users." },
+  { id: "doc_02", title: "Auto-Scaling Policies and Triggers", text: "Auto-scaling policies define the rules that govern when and how compute resources are added or removed from a service fleet. Reactive triggers fire when real-time metrics—such as CPU utilization, request queue depth, or p99 latency—breach a configured threshold for a sustained window. Predictive auto-scaling leverages historical traffic patterns and time-series forecasting models to pre-provision capacity before anticipated demand surges. Cool-down periods prevent thrashing by enforcing a minimum interval between consecutive scaling actions. Well-tuned policies strike a balance between cost efficiency and availability, ensuring the system neither over-provisions idle resources nor under-provisions during critical traffic ramps." },
+  { id: "doc_03", title: "Rate Limiting and Throttling Strategies", text: "Rate limiting controls the volume of requests a client can issue within a given time window, protecting backend services from abusive or runaway traffic. Token-bucket and sliding-window algorithms are the most widely adopted, each offering different burst-tolerance characteristics. When a client exceeds its allotted quota, the gateway returns an HTTP 429 response and includes a Retry-After header indicating when the client may resume. Distributed rate limiters synchronize counters across gateway nodes using an in-memory data store like Redis, ensuring consistent enforcement even in multi-region deployments. Throttling acts as a safety valve that gracefully degrades throughput rather than allowing cascading overloads to propagate downstream." },
+  { id: "doc_04", title: "Distributed Caching Strategies", text: "Distributed caches such as Redis and Memcached store frequently accessed data in memory, drastically reducing read latency and offloading repetitive queries from the primary database. A cache-aside pattern lets the application check the cache first and fall back to the database only on a miss, writing the result back for subsequent requests. Write-through and write-behind strategies push updates into the cache at write time, trading additional write latency for stronger read consistency. Consistent hashing distributes keys evenly across cache nodes and minimizes key redistribution when the cluster scales. Time-to-live expiration policies and active invalidation hooks prevent stale data from persisting beyond an acceptable freshness window." },
+  { id: "doc_05", title: "Circuit Breaker Pattern for Fault Tolerance", text: "The circuit breaker pattern monitors outbound calls to a dependency and trips open when the failure rate exceeds a threshold, immediately short-circuiting subsequent requests with a fallback response. In the open state, no traffic is forwarded to the degraded downstream, giving it time to recover without being overwhelmed by retry storms. After a configurable timeout the breaker transitions to half-open, allowing a limited probe of requests to test whether the dependency has regained health. Successful probes reset the breaker to the closed state and restore normal traffic flow. Libraries like Hystrix, Resilience4j, and Polly provide production-grade implementations with metrics dashboards that surface failure rates, state transitions, and fallback invocation counts in real time." },
+  { id: "doc_06", title: "Vector Index Performance and ANN Algorithms", text: "Approximate nearest-neighbor algorithms trade a small amount of recall for orders-of-magnitude speedup over brute-force search in high-dimensional vector spaces. HNSW constructs a hierarchical navigable small-world graph that supports sub-millisecond queries even on collections exceeding ten million vectors. IVF-PQ partitions the vector space into Voronoi cells and applies product quantization to compress residuals, yielding compact indexes that fit entirely in RAM. Tuning parameters such as ef_search, nprobe, and the number of sub-quantizers directly influence the recall-latency trade-off. Benchmarking with realistic query distributions is essential, because synthetic uniform queries can mask performance cliffs that appear under skewed production workloads." },
+  { id: "doc_07", title: "Embedding Model Latency and Batching", text: "Transformer-based embedding models incur non-trivial inference latency, especially when encoding long sequences on CPU-only hardware. Batching multiple texts into a single forward pass amortizes the fixed overhead of model loading and GPU kernel launches, increasing throughput by up to an order of magnitude. Dynamic batching collects incoming requests over a short accumulation window and dispatches them as a single padded tensor, balancing latency against utilization. Model distillation and ONNX Runtime optimization further reduce per-query inference time without significant loss in embedding quality. Monitoring p50 and p99 encode latencies is critical for sizing the embedding service and setting appropriate timeout budgets in the retrieval pipeline." },
+  { id: "doc_08", title: "Database Connection Pooling Under High Concurrency", text: "Connection pooling maintains a reusable set of database connections that application threads borrow and return, eliminating the overhead of establishing a new TCP handshake and authentication round-trip for every query. Under high concurrency, an undersized pool forces incoming requests to queue, inflating tail latencies and risking cascading timeouts across dependent services. External poolers such as PgBouncer and ProxySQL sit between the application and the database, multiplexing thousands of client connections onto a smaller set of server connections. Idle-connection reaping and maximum-lifetime settings ensure that stale or leaked connections do not exhaust the pool. Proper pool sizing—guided by Little's Law and observed query durations—is one of the highest-leverage tuning actions for latency-sensitive workloads." },
+  { id: "doc_09", title: "Load Balancer Algorithms", text: "Load balancers distribute inbound requests across a pool of backend servers using algorithms that optimize for different objectives. Round-robin cycles through servers sequentially and works well when instances are homogeneous and request costs are uniform. Least-connections routing directs each new request to the server with the fewest active connections, naturally adapting to heterogeneous processing speeds. IP-hash deterministically maps a client address to a specific backend, providing session affinity without requiring sticky-session cookies. Health checks continuously probe each backend and remove unhealthy instances from the rotation, ensuring that traffic is never forwarded to a server that cannot respond." },
+  { id: "doc_10", title: "Monitoring and Alerting During Traffic Spikes", text: "Effective monitoring during traffic spikes relies on real-time dashboards that surface the four golden signals: latency, traffic volume, error rate, and resource saturation. Alerting rules should use multi-window burn-rate policies rather than static thresholds, reducing false positives while still catching genuine degradation early. Distributed tracing with OpenTelemetry correlates individual requests across service boundaries, enabling engineers to pinpoint bottlenecks that emerge only under load. Log aggregation pipelines funnel structured events into a central store where anomaly-detection models can flag unusual patterns automatically. Post-incident reviews that reference time-aligned metrics and traces are essential for hardening the system against future surges." }
 ];
 
 // ─── DYNAMIC VIEW SWITCHER ───
 function switchPane(paneId) {
-  // Update Top Tabs
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   const targetTab = document.getElementById(`tab-${paneId}`);
   if (targetTab) targetTab.classList.add('active');
 
-  // Switch Active View Pane with animation
   document.querySelectorAll('.view-pane').forEach(p => p.classList.remove('active'));
   const targetPane = document.getElementById(`pane-${paneId}`);
   if (targetPane) targetPane.classList.add('active');
@@ -904,20 +1035,81 @@ function renderStageChart() {
   });
 }
 
-// ─── CORPUS RENDERING ───
+// ─── CORPUS RENDERING & INTERACTIVE MODAL ───
 function renderCorpus() {
   const container = document.getElementById('corpusGrid');
   container.innerHTML = '';
-  CORPUS.forEach(doc => {
+  CORPUS.forEach((doc, idx) => {
     container.innerHTML += `
-      <div class="corpus-card">
-        <div class="corpus-id">${doc.id}</div>
+      <div class="corpus-card" onclick="openDocModal(${idx})">
+        <div class="corpus-id">
+          <span>${doc.id}</span>
+          <span style="font-size:10px;color:var(--text-muted)">CLICK TO OPEN 🔍</span>
+        </div>
         <div class="corpus-title">${doc.title}</div>
-        <div class="corpus-text">${doc.text}</div>
+        <div class="corpus-text">${doc.text.slice(0, 120)}...</div>
       </div>
     `;
   });
 }
+
+function openDocModal(docIndex) {
+  const doc = CORPUS[docIndex];
+  document.getElementById('modalDocId').innerText = doc.id;
+  document.getElementById('modalDocTitle').innerText = doc.title;
+  document.getElementById('modalDocText').innerText = doc.text;
+
+  // Generate chunks breakdown
+  const chunkBox = document.getElementById('modalChunkBox');
+  chunkBox.innerHTML = '';
+  
+  // Create simulated 256-char chunks
+  const words = doc.text.split(' ');
+  let currentChunk = [];
+  let chunkIdx = 0;
+
+  words.forEach(w => {
+    currentChunk.push(w);
+    if (currentChunk.join(' ').length >= 200) {
+      chunkBox.innerHTML += `
+        <div class="doc-chunk-item">
+          <div class="doc-chunk-id">${doc.id}_chunk_${chunkIdx} (FAISS Vector ID)</div>
+          <div style="color:var(--text-main)">"${currentChunk.join(' ')}"</div>
+        </div>
+      `;
+      chunkIdx++;
+      currentChunk = [];
+    }
+  });
+
+  if (currentChunk.length > 0) {
+    chunkBox.innerHTML += `
+      <div class="doc-chunk-item">
+        <div class="doc-chunk-id">${doc.id}_chunk_${chunkIdx} (FAISS Vector ID)</div>
+        <div style="color:var(--text-main)">"${currentChunk.join(' ')}"</div>
+      </div>
+    `;
+  }
+
+  // Update Right Inspector Panel with Document details
+  document.getElementById('propQuery').innerText = doc.title;
+  document.getElementById('propStrat').innerText = `Corpus Entry (${doc.id})`;
+  document.getElementById('propLat').innerText = `N/A (Indexed)`;
+  document.getElementById('propChunk').innerText = `${doc.id}_chunk_0`;
+  document.getElementById('propScore').innerText = `1.000 (Owner)`;
+  document.getElementById('propTerms').innerText = `Chunk Size: 256, Overlap: 32`;
+
+  document.getElementById('docModalOverlay').style.display = 'flex';
+}
+
+function closeDocModal() {
+  document.getElementById('docModalOverlay').style.display = 'none';
+}
+
+// Close modal on overlay click
+document.getElementById('docModalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeDocModal();
+});
 
 // ─── RIGHT TREE & INSPECTOR ───
 function buildTree() {
