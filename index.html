@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RAG Vector Search Benchmark</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0a0e1a;--surface:#111827;--card:#1a2235;--border:#1e2d4a;
+    --text:#e2e8f0;--muted:#64748b;--accent:#3b82f6;
+    --green:#10b981;--amber:#f59e0b;--red:#ef4444;
+    --glass:rgba(255,255,255,.04);
+  }
+  body{
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    background:var(--bg);color:var(--text);line-height:1.6;
+    min-height:100vh;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  .noise{
+    position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.03;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .container{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-index:1}
+
+  /* Hero */
+  .hero{text-align:center;padding:3rem 0 2rem;position:relative}
+  .hero::before{
+    content:'';position:absolute;top:-60px;left:50%;transform:translateX(-50%);
+    width:600px;height:600px;
+    background:radial-gradient(circle,rgba(59,130,246,.12) 0%,transparent 70%);
+    pointer-events:none;
+  }
+  .hero-badge{
+    display:inline-flex;align-items:center;gap:.5rem;
+    padding:.4rem 1rem;border-radius:999px;font-size:.8rem;font-weight:600;
+    background:rgba(59,130,246,.12);color:var(--accent);border:1px solid rgba(59,130,246,.2);
+    margin-bottom:1.25rem;letter-spacing:.02em;
+  }
+  .hero h1{
+    font-size:clamp(2rem,5vw,3.2rem);font-weight:900;
+    background:linear-gradient(135deg,#fff 0%,#94a3b8 100%);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    letter-spacing:-.02em;margin-bottom:.75rem;
+  }
+  .hero p{color:var(--muted);font-size:1.05rem;max-width:680px;margin:0 auto}
+
+  /* Stat cards */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;margin:2.5rem 0}
+  .stat{
+    background:var(--glass);backdrop-filter:blur(12px);
+    border:1px solid var(--border);border-radius:16px;
+    padding:1.5rem;text-align:center;
+    transition:transform .2s,border-color .2s;
+  }
+  .stat:hover{transform:translateY(-2px);border-color:rgba(59,130,246,.3)}
+  .stat-icon{font-size:1.5rem;margin-bottom:.5rem}
+  .stat-value{font-size:2rem;font-weight:800;color:#fff}
+  .stat-label{font-size:.8rem;color:var(--muted);margin-top:.25rem;text-transform:uppercase;letter-spacing:.06em}
+
+  /* Section */
+  .section{margin:3rem 0}
+  .section-header{display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem}
+  .section-header h2{font-size:1.5rem;font-weight:700;color:#fff}
+  .section-header .icon{font-size:1.4rem}
+
+  /* Cards */
+  .card{
+    background:var(--card);border:1px solid var(--border);border-radius:16px;
+    padding:1.75rem;transition:border-color .2s;
+  }
+  .card:hover{border-color:rgba(59,130,246,.2)}
+
+  /* Tabs */
+  .tabs{display:flex;gap:.5rem;margin-bottom:1.5rem;flex-wrap:wrap}
+  .tab{
+    padding:.5rem 1.25rem;border-radius:10px;font-size:.85rem;font-weight:600;
+    background:var(--glass);border:1px solid var(--border);color:var(--muted);
+    cursor:pointer;transition:all .2s;
+  }
+  .tab:hover{color:var(--text);border-color:rgba(59,130,246,.3)}
+  .tab.active{background:rgba(59,130,246,.15);color:var(--accent);border-color:rgba(59,130,246,.4)}
+
+  /* Chart */
+  .chart-wrap{position:relative;height:340px}
+
+  /* Leaderboard */
+  .leaderboard{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+  @media(max-width:768px){.leaderboard{grid-template-columns:1fr}}
+
+  table{width:100%;border-collapse:separate;border-spacing:0}
+  th{
+    text-align:left;padding:.75rem 1rem;font-size:.75rem;font-weight:600;
+    color:var(--muted);text-transform:uppercase;letter-spacing:.06em;
+    border-bottom:1px solid var(--border);
+  }
+  td{
+    padding:.75rem 1rem;font-size:.9rem;border-bottom:1px solid rgba(30,45,74,.5);
+  }
+  tr:last-child td{border-bottom:none}
+  .winner{
+    display:inline-flex;align-items:center;gap:.35rem;
+    background:rgba(16,185,129,.12);color:var(--green);
+    padding:.15rem .6rem;border-radius:6px;font-weight:600;font-size:.8rem;
+  }
+
+  /* Strategy colors */
+  .strat-a{color:var(--accent)}
+  .strat-b{color:var(--green)}
+  .strat-hyde{color:var(--amber)}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:.5rem}
+  .dot-a{background:var(--accent)}
+  .dot-b{background:var(--green)}
+  .dot-hyde{background:var(--amber)}
+
+  /* Query cards */
+  .query-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:1.25rem}
+  .query-card{
+    background:var(--glass);backdrop-filter:blur(8px);
+    border:1px solid var(--border);border-radius:14px;overflow:hidden;
+    transition:border-color .2s,transform .2s;
+  }
+  .query-card:hover{border-color:rgba(59,130,246,.25);transform:translateY(-2px)}
+  .query-card-header{
+    padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);
+    display:flex;align-items:center;gap:.75rem;cursor:pointer;
+    user-select:none;
+  }
+  .query-card-header h3{font-size:.95rem;font-weight:600;flex:1;color:#fff}
+  .query-card-toggle{
+    font-size:1.2rem;color:var(--muted);transition:transform .3s;
+  }
+  .query-card-toggle.open{transform:rotate(180deg)}
+  .query-card-body{max-height:0;overflow:hidden;transition:max-height .4s ease}
+  .query-card-body.open{max-height:2000px}
+  .query-card-inner{padding:1.25rem 1.5rem}
+
+  /* Strategy row inside query */
+  .strat-row{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1rem;
+  }
+  @media(max-width:768px){.strat-row{grid-template-columns:1fr}}
+  .strat-block{
+    background:var(--card);border:1px solid var(--border);border-radius:12px;
+    padding:1rem 1.25rem;
+  }
+  .strat-block-title{font-size:.8rem;font-weight:700;margin-bottom:.75rem;display:flex;align-items:center}
+  .metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+  .metric-item{
+    background:rgba(255,255,255,.02);border-radius:8px;padding:.5rem .75rem;
+  }
+  .metric-item-label{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+  .metric-item-value{font-size:1.1rem;font-weight:700;color:#fff}
+
+  /* Chunk list */
+  .chunk-list{margin-top:.75rem}
+  .chunk{
+    background:rgba(255,255,255,.02);border-radius:8px;padding:.6rem .75rem;
+    margin-bottom:.4rem;font-size:.78rem;color:var(--muted);
+  }
+  .chunk-rank{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:20px;height:20px;border-radius:6px;font-size:.7rem;font-weight:700;
+    margin-right:.5rem;color:#fff;
+  }
+  .chunk-score{float:right;font-family:'JetBrains Mono',monospace;font-size:.75rem}
+
+  /* Architecture */
+  .arch{
+    background:var(--card);border:1px solid var(--border);border-radius:14px;
+    padding:1.5rem 2rem;margin:2rem 0;font-family:'JetBrains Mono',monospace;
+    font-size:.82rem;color:var(--muted);line-height:1.8;white-space:pre;
+    overflow-x:auto;
+  }
+  .arch .hl{color:var(--accent);font-weight:600}
+  .arch .hlg{color:var(--green);font-weight:600}
+  .arch .hly{color:var(--amber);font-weight:600}
+
+  /* Winners row */
+  .winners{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.75rem;margin-top:1.25rem}
+  .winner-card{
+    background:rgba(255,255,255,.02);border:1px solid var(--border);
+    border-radius:10px;padding:.75rem 1rem;display:flex;align-items:center;gap:.75rem;
+  }
+  .winner-card .emoji{font-size:1.3rem}
+  .winner-card .wlabel{font-size:.75rem;color:var(--muted)}
+  .winner-card .wvalue{font-size:.9rem;font-weight:700;color:#fff}
+
+  /* Footer */
+  .footer{
+    text-align:center;padding:2.5rem 0 1.5rem;color:var(--muted);
+    font-size:.8rem;border-top:1px solid var(--border);margin-top:3rem;
+  }
+
+  /* Fade-in animation */
+  .fade-in{opacity:0;transform:translateY(16px);animation:fadeUp .6s ease forwards}
+  @keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+  .delay-1{animation-delay:.1s}
+  .delay-2{animation-delay:.2s}
+  .delay-3{animation-delay:.3s}
+  .delay-4{animation-delay:.4s}
+</style>
+</head>
+<body>
+<div class="noise"></div>
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero fade-in">
+    <div class="hero-badge">⚡ Retrieval Benchmark Dashboard</div>
+    <h1>RAG Vector Search</h1>
+    <p>Comparing three retrieval strategies on a distributed systems corpus — measuring MRR, context precision, recall, and latency.</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats fade-in delay-1">
+    <div class="stat">
+      <div class="stat-icon">📄</div>
+      <div class="stat-value">10</div>
+      <div class="stat-label">Documents</div>
+    </div>
+    <div class="stat">
+      <div class="stat-icon">🧩</div>
+      <div class="stat-value">49</div>
+      <div class="stat-label">Chunks</div>
+    </div>
+    <div class="stat">
+      <div class="stat-icon">🔀</div>
+      <div class="stat-value">3</div>
+      <div class="stat-label">Strategies</div>
+    </div>
+    <div class="stat">
+      <div class="stat-icon">❓</div>
+      <div class="stat-value">3</div>
+      <div class="stat-label">Queries</div>
+    </div>
+    <div class="stat">
+      <div class="stat-icon">✅</div>
+      <div class="stat-value">100%</div>
+      <div class="stat-label">Hit Rate</div>
+    </div>
+  </div>
+
+  <!-- Architecture -->
+  <div class="section fade-in delay-2">
+    <div class="section-header">
+      <span class="icon">📐</span>
+      <h2>Pipeline Architecture</h2>
+    </div>
+    <div class="arch"><span class="hl">INGESTION</span>
+  Documents → Chunker (256 chars, 32 overlap)
+            → LocalEmbedder (all-MiniLM-L6-v2, 384d)
+            → FAISSVectorStore (IndexFlatIP)
+
+<span class="hl">STRATEGY A</span> — Baseline
+  Query → embed → FAISS search → results
+
+<span class="hlg">STRATEGY B</span> — Query Expansion + Reranking
+  Query → QueryExpander → embed → FAISS
+        → MMR rerank → CrossEncoder rerank
+        → compress → lost-in-middle reorder → results
+
+<span class="hly">STRATEGY HyDE</span> — Hypothetical Document Embeddings
+  Query → generate 3 hypothetical answer docs
+        → embed each → average vectors
+        → FAISS → CrossEncoder rerank
+        → lost-in-middle reorder → results</div>
+  </div>
+
+  <!-- Metrics Charts -->
+  <div class="section fade-in delay-3">
+    <div class="section-header">
+      <span class="icon">📊</span>
+      <h2>Metrics Comparison</h2>
+    </div>
+    <div class="card">
+      <div class="tabs" id="metricTabs">
+        <div class="tab active" data-metric="mrr">MRR</div>
+        <div class="tab" data-metric="context_precision">Precision</div>
+        <div class="tab" data-metric="context_recall">Recall</div>
+        <div class="tab" data-metric="latency">Latency</div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="metricsChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaderboard -->
+  <div class="section fade-in delay-4">
+    <div class="section-header">
+      <span class="icon">🏆</span>
+      <h2>Aggregate Leaderboard</h2>
+    </div>
+    <div class="leaderboard">
+      <div class="card">
+        <table>
+          <thead>
+            <tr><th>Strategy</th><th>Avg MRR</th><th>Avg Precision</th><th>Avg Recall</th><th>Avg Latency</th></tr>
+          </thead>
+          <tbody id="leaderboardBody"></tbody>
+        </table>
+        <div class="winners" id="winners"></div>
+      </div>
+      <div class="card">
+        <div class="chart-wrap">
+          <canvas id="radarChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Per-Query Breakdown -->
+  <div class="section">
+    <div class="section-header">
+      <span class="icon">🔍</span>
+      <h2>Per-Query Breakdown</h2>
+    </div>
+    <div class="query-grid" id="queryGrid"></div>
+  </div>
+
+  <div class="footer">
+    RAG Vector Search Benchmark — FAISS · Sentence Transformers · Chart.js
+  </div>
+</div>
+
+<script>
+const DATA = {
+  "evaluation_metrics": {
+    "How does the system handle peak load?": {
+      "A": {"hit_at_k":true,"mrr":1.0,"context_precision":1.0,"context_recall":0.5,"faithfulness":0.85,"answer_relevancy":0.8},
+      "B": {"hit_at_k":true,"mrr":1.0,"context_precision":1.0,"context_recall":0.75,"faithfulness":0.85,"answer_relevancy":0.8},
+      "HYDE": {"hit_at_k":true,"mrr":1.0,"context_precision":0.6667,"context_recall":0.25,"faithfulness":0.85,"answer_relevancy":0.8}
+    },
+    "What strategies are used for caching?": {
+      "A": {"hit_at_k":true,"mrr":1.0,"context_precision":1.0,"context_recall":0.5,"faithfulness":0.85,"answer_relevancy":0.8},
+      "B": {"hit_at_k":true,"mrr":1.0,"context_precision":0.6667,"context_recall":0.5,"faithfulness":0.85,"answer_relevancy":0.8},
+      "HYDE": {"hit_at_k":true,"mrr":1.0,"context_precision":0.6667,"context_recall":0.5,"faithfulness":0.85,"answer_relevancy":0.8}
+    },
+    "How are failures detected and recovered?": {
+      "A": {"hit_at_k":true,"mrr":1.0,"context_precision":1.0,"context_recall":0.3333,"faithfulness":0.85,"answer_relevancy":0.8},
+      "B": {"hit_at_k":true,"mrr":1.0,"context_precision":1.0,"context_recall":0.6667,"faithfulness":0.85,"answer_relevancy":0.8},
+      "HYDE": {"hit_at_k":true,"mrr":1.0,"context_precision":1.0,"context_recall":0.3333,"faithfulness":0.85,"answer_relevancy":0.8}
+    }
+  },
+  "benchmark_details": [
+    {"query":"How does the system handle peak load?","strategy":"A","latency_ms":16.0,"expanded_query":null,"results":[{"rank":1,"chunk_id":"doc_02_chunk_3","source_doc_id":"doc_02","score":0.6,"text_preview":"before anticipated demand surges Cool-down periods prevent thrashing by enforcing a minimum interval between consecutive"},{"rank":2,"chunk_id":"doc_01_chunk_1","source_doc_id":"doc_01","score":0.5469,"text_preview":"low latency during demand surges When peak load exceeds the capacity of a single node, the orchestration layer provision"},{"rank":3,"chunk_id":"doc_02_chunk_4","source_doc_id":"doc_02","score":0.438,"text_preview":"ween consecutive scaling actions Well-tuned policies strike a balance between cost efficiency and availability, ensuring"}]},
+    {"query":"How does the system handle peak load?","strategy":"B","latency_ms":244.6,"expanded_query":"traffic surge, demand spike, high throughput, capacity planning, horizontal scaling","results":[{"rank":1,"chunk_id":"doc_01_chunk_1","source_doc_id":"doc_01","score":0.6325,"text_preview":"low latency during demand surges When peak load exceeds the capacity of a single node, the orchestration layer provision"},{"rank":2,"chunk_id":"doc_02_chunk_3","source_doc_id":"doc_02","score":-11.0155,"text_preview":"before anticipated demand surges Cool-down periods prevent thrashing by enforcing a minimum interval between consecutive"},{"rank":3,"chunk_id":"doc_10_chunk_0","source_doc_id":"doc_10","score":-10.7069,"text_preview":"Effective monitoring during traffic spikes relies on real-time dashboards that surface the four golden signals: latency,"}]},
+    {"query":"How does the system handle peak load?","strategy":"HYDE","latency_ms":101.8,"expanded_query":"traffic surge, demand spike, high throughput, capacity planning, horizontal scaling","results":[{"rank":1,"chunk_id":"doc_01_chunk_1","source_doc_id":"doc_01","score":0.6325,"text_preview":"low latency during demand surges When peak load exceeds the capacity of a single node, the orchestration layer provision"},{"rank":2,"chunk_id":"doc_03_chunk_4","source_doc_id":"doc_03","score":-9.7893,"text_preview":"even in multi-region deployments Throttling acts as a safety valve that gracefully degrades throughput rather than allow"},{"rank":3,"chunk_id":"doc_01_chunk_4","source_doc_id":"doc_01","score":-9.4622,"text_preview":"on crosses predefined thresholds The elasticity of horizontal expansion allows the cluster to absorb sudden traffic spik"}]},
+    {"query":"What strategies are used for caching?","strategy":"A","latency_ms":10.3,"expanded_query":null,"results":[{"rank":1,"chunk_id":"doc_04_chunk_0","source_doc_id":"doc_04","score":0.5776,"text_preview":"Distributed caches such as Redis and Memcached store frequently accessed data in memory, drastically reducing read laten"},{"rank":2,"chunk_id":"doc_04_chunk_1","source_doc_id":"doc_04","score":0.5703,"text_preview":"ueries from the primary database A cache-aside pattern lets the application check the cache first and fall back to the d"},{"rank":3,"chunk_id":"doc_04_chunk_2","source_doc_id":"doc_04","score":0.5058,"text_preview":"ult back for subsequent requests Write-through and write-behind strategies push updates into the cache at write time, tr"}]},
+    {"query":"What strategies are used for caching?","strategy":"B","latency_ms":166.3,"expanded_query":"distributed cache, Redis, Memcached, cache-aside, write-through, TTL expiration","results":[{"rank":1,"chunk_id":"doc_04_chunk_4","source_doc_id":"doc_04","score":-10.6048,"text_preview":"ribution when the cluster scales Time-to-live expiration policies and active invalidation hooks prevent stale data from "},{"rank":2,"chunk_id":"doc_09_chunk_2","source_doc_id":"doc_09","score":-11.229,"text_preview":"heterogeneous processing speeds IP-hash deterministically maps a client address to a specific backend, providing session"},{"rank":3,"chunk_id":"doc_04_chunk_0","source_doc_id":"doc_04","score":-10.9487,"text_preview":"Distributed caches such as Redis and Memcached store frequently accessed data in memory, drastically reducing read laten"}]},
+    {"query":"What strategies are used for caching?","strategy":"HYDE","latency_ms":104.4,"expanded_query":"distributed cache, Redis, Memcached, cache-aside, write-through, TTL expiration","results":[{"rank":1,"chunk_id":"doc_04_chunk_2","source_doc_id":"doc_04","score":-9.0048,"text_preview":"ult back for subsequent requests Write-through and write-behind strategies push updates into the cache at write time, tr"},{"rank":2,"chunk_id":"doc_04_chunk_3","source_doc_id":"doc_04","score":-10.5433,"text_preview":"cy for stronger read consistency Consistent hashing distributes keys evenly across cache nodes and minimizes key redistr"},{"rank":3,"chunk_id":"doc_08_chunk_1","source_doc_id":"doc_08","score":-10.5364,"text_preview":"ation round-trip for every query Under high concurrency, an undersized pool forces incoming requests to queue, inflating"}]},
+    {"query":"How are failures detected and recovered?","strategy":"A","latency_ms":11.4,"expanded_query":null,"results":[{"rank":1,"chunk_id":"doc_05_chunk_0","source_doc_id":"doc_05","score":0.3798,"text_preview":"The circuit breaker pattern monitors outbound calls to a dependency and trips open when the failure rate exceeds a thres"},{"rank":2,"chunk_id":"doc_05_chunk_2","source_doc_id":"doc_05","score":0.3622,"text_preview":"eing overwhelmed by retry storms After a configurable timeout the breaker transitions to half-open, allowing a limited p"},{"rank":3,"chunk_id":"doc_05_chunk_3","source_doc_id":"doc_05","score":0.3471,"text_preview":"e dependency has regained health Successful probes reset the breaker to the closed state and restore normal traffic flow"}]},
+    {"query":"How are failures detected and recovered?","strategy":"B","latency_ms":172.6,"expanded_query":"fault tolerance, circuit breaker, failover, degradation, resilience, recovery","results":[{"rank":1,"chunk_id":"doc_05_chunk_0","source_doc_id":"doc_05","score":-7.1859,"text_preview":"The circuit breaker pattern monitors outbound calls to a dependency and trips open when the failure rate exceeds a thres"},{"rank":2,"chunk_id":"doc_10_chunk_2","source_doc_id":"doc_10","score":-10.759,"text_preview":"tching genuine degradation early Distributed tracing with OpenTelemetry correlates individual requests across service bo"},{"rank":3,"chunk_id":"doc_05_chunk_4","source_doc_id":"doc_05","score":-8.2292,"text_preview":"and restore normal traffic flow Libraries like Hystrix, Resilience4j, and Polly provide production-grade implementations"}]},
+    {"query":"How are failures detected and recovered?","strategy":"HYDE","latency_ms":99.6,"expanded_query":"fault tolerance, circuit breaker, failover, degradation, resilience, recovery","results":[{"rank":1,"chunk_id":"doc_05_chunk_0","source_doc_id":"doc_05","score":-7.1859,"text_preview":"The circuit breaker pattern monitors outbound calls to a dependency and trips open when the failure rate exceeds a thres"},{"rank":2,"chunk_id":"doc_05_chunk_1","source_doc_id":"doc_05","score":-8.933,"text_preview":"equests with a fallback response In the open state, no traffic is forwarded to the degraded downstream, giving it time t"},{"rank":3,"chunk_id":"doc_05_chunk_4","source_doc_id":"doc_05","score":-8.2292,"text_preview":"and restore normal traffic flow Libraries like Hystrix, Resilience4j, and Polly provide production-grade implementations"}]}
+  ]
+};
+
+const STRATS = ['A','B','HYDE'];
+const COLORS = {A:'#3b82f6',B:'#10b981',HYDE:'#f59e0b'};
+const COLORS_BG = {A:'rgba(59,130,246,.15)',B:'rgba(16,185,129,.15)',HYDE:'rgba(245,158,11,.15)'};
+const QUERIES = Object.keys(DATA.evaluation_metrics);
+
+function avg(arr){return arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : 0}
+function shortQ(q){return q.length>40 ? q.slice(0,40)+'…' : q}
+
+// ─── Metrics Chart ───
+Chart.defaults.color = '#94a3b8';
+Chart.defaults.borderColor = 'rgba(30,45,74,.5)';
+
+let metricsChart;
+function renderMetricsChart(metric){
+  const ctx = document.getElementById('metricsChart');
+  if(metricsChart) metricsChart.destroy();
+
+  if(metric === 'latency'){
+    const latByStrat = {};
+    DATA.benchmark_details.forEach(d=>{
+      if(!latByStrat[d.strategy]) latByStrat[d.strategy]=[];
+      latByStrat[d.strategy].push(d.latency_ms);
+    });
+    metricsChart = new Chart(ctx,{
+      type:'bar',
+      data:{
+        labels:STRATS.map(s=>'Strategy '+s),
+        datasets:[{
+          data:STRATS.map(s=>Math.round(avg(latByStrat[s]||[])*10)/10),
+          backgroundColor:STRATS.map(s=>COLORS_BG[s]),
+          borderColor:STRATS.map(s=>COLORS[s]),
+          borderWidth:2,borderRadius:8,
+        }]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},
+          tooltip:{callbacks:{label:c=>c.parsed.y+' ms'}}
+        },
+        scales:{y:{title:{display:true,text:'Latency (ms)'},grid:{color:'rgba(30,45,74,.4)'}},
+                x:{grid:{display:false}}}
+      }
+    });
+  } else {
+    const datasets = STRATS.map(s=>({
+      label:'Strategy '+s,
+      data:QUERIES.map(q=>{
+        const m = DATA.evaluation_metrics[q]?.[s]?.[metric]||0;
+        return Math.round(m*10000)/10000;
+      }),
+      backgroundColor:COLORS_BG[s],
+      borderColor:COLORS[s],
+      borderWidth:2,borderRadius:8,
+    }));
+    metricsChart = new Chart(ctx,{
+      type:'bar',
+      data:{labels:QUERIES.map(shortQ),datasets},
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{position:'top',labels:{usePointStyle:true,pointStyle:'circle',padding:20}}},
+        scales:{y:{min:0,max:1.15,grid:{color:'rgba(30,45,74,.4)'}},x:{grid:{display:false}}}
+      }
+    });
+  }
+}
+renderMetricsChart('mrr');
+
+document.querySelectorAll('#metricTabs .tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('#metricTabs .tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    renderMetricsChart(tab.dataset.metric);
+  });
+});
+
+// ─── Leaderboard ───
+const agg = {};
+STRATS.forEach(s=>{
+  const mrrs=[],precs=[],recalls=[],lats=[];
+  QUERIES.forEach(q=>{
+    const m=DATA.evaluation_metrics[q]?.[s]||{};
+    mrrs.push(m.mrr||0);precs.push(m.context_precision||0);recalls.push(m.context_recall||0);
+  });
+  DATA.benchmark_details.forEach(d=>{if(d.strategy===s) lats.push(d.latency_ms)});
+  agg[s]={mrr:avg(mrrs),prec:avg(precs),recall:avg(recalls),lat:avg(lats)};
+});
+
+const bestMrr=STRATS.reduce((a,b)=>agg[a].mrr>=agg[b].mrr?a:b);
+const bestPrec=STRATS.reduce((a,b)=>agg[a].prec>=agg[b].prec?a:b);
+const bestRecall=STRATS.reduce((a,b)=>agg[a].recall>=agg[b].recall?a:b);
+const fastest=STRATS.reduce((a,b)=>agg[a].lat<=agg[b].lat?a:b);
+
+const tbody=document.getElementById('leaderboardBody');
+STRATS.forEach(s=>{
+  const a=agg[s];
+  const dotClass='dot-'+s.toLowerCase().replace('hyde','hyde');
+  tbody.innerHTML+=`<tr>
+    <td><span class="dot dot-${s==='HYDE'?'hyde':s.toLowerCase()}"></span>${s}</td>
+    <td>${a.mrr.toFixed(4)} ${s===bestMrr?'<span class="winner">👑 Best</span>':''}</td>
+    <td>${a.prec.toFixed(4)} ${s===bestPrec?'<span class="winner">👑 Best</span>':''}</td>
+    <td>${a.recall.toFixed(4)} ${s===bestRecall?'<span class="winner">👑 Best</span>':''}</td>
+    <td>${a.lat.toFixed(1)} ms ${s===fastest?'<span class="winner">⚡ Fast</span>':''}</td>
+  </tr>`;
+});
+
+document.getElementById('winners').innerHTML=`
+  <div class="winner-card"><span class="emoji">🎯</span><div><div class="wlabel">MRR Winner</div><div class="wvalue">Strategy ${bestMrr}</div></div></div>
+  <div class="winner-card"><span class="emoji">📏</span><div><div class="wlabel">Precision Winner</div><div class="wvalue">Strategy ${bestPrec}</div></div></div>
+  <div class="winner-card"><span class="emoji">📦</span><div><div class="wlabel">Recall Winner</div><div class="wvalue">Strategy ${bestRecall}</div></div></div>
+  <div class="winner-card"><span class="emoji">⚡</span><div><div class="wlabel">Fastest</div><div class="wvalue">Strategy ${fastest}</div></div></div>
+`;
+
+// ─── Radar Chart ───
+const maxLat = Math.max(...STRATS.map(s=>agg[s].lat));
+new Chart(document.getElementById('radarChart'),{
+  type:'radar',
+  data:{
+    labels:['MRR','Precision','Recall','Speed'],
+    datasets:STRATS.map(s=>({
+      label:'Strategy '+s,
+      data:[agg[s].mrr, agg[s].prec, agg[s].recall, maxLat>0?1-(agg[s].lat/maxLat):0],
+      borderColor:COLORS[s],
+      backgroundColor:COLORS_BG[s],
+      borderWidth:2,pointRadius:4,pointBackgroundColor:COLORS[s],
+    }))
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    scales:{r:{min:0,max:1.1,ticks:{display:false},grid:{color:'rgba(30,45,74,.5)'},pointLabels:{font:{size:13}}}},
+    plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyle:'circle',padding:16}}}
+  }
+});
+
+// ─── Per-Query Cards ───
+const grid=document.getElementById('queryGrid');
+QUERIES.forEach((query,qi)=>{
+  const details=DATA.benchmark_details.filter(d=>d.query===query);
+  const qMetrics=DATA.evaluation_metrics[query]||{};
+
+  let stratHTML='';
+  details.forEach(d=>{
+    const m=qMetrics[d.strategy]||{};
+    const color=COLORS[d.strategy];
+    let chunksHTML='';
+    d.results.forEach(r=>{
+      chunksHTML+=`<div class="chunk">
+        <span class="chunk-rank" style="background:${color}">${r.rank}</span>
+        ${r.source_doc_id} — ${r.text_preview.slice(0,70)}…
+        <span class="chunk-score">${r.score.toFixed(4)}</span>
+      </div>`;
+    });
+
+    stratHTML+=`<div class="strat-block">
+      <div class="strat-block-title"><span class="dot dot-${d.strategy==='HYDE'?'hyde':d.strategy.toLowerCase()}"></span>Strategy ${d.strategy}</div>
+      <div class="metric-grid">
+        <div class="metric-item"><div class="metric-item-label">MRR</div><div class="metric-item-value">${(m.mrr||0).toFixed(4)}</div></div>
+        <div class="metric-item"><div class="metric-item-label">Hit@3</div><div class="metric-item-value">${m.hit_at_k?'✓':'✗'}</div></div>
+        <div class="metric-item"><div class="metric-item-label">Precision</div><div class="metric-item-value">${(m.context_precision||0).toFixed(4)}</div></div>
+        <div class="metric-item"><div class="metric-item-label">Recall</div><div class="metric-item-value">${(m.context_recall||0).toFixed(4)}</div></div>
+        <div class="metric-item"><div class="metric-item-label">Latency</div><div class="metric-item-value">${d.latency_ms.toFixed(1)} ms</div></div>
+        <div class="metric-item"><div class="metric-item-label">Hit Rate</div><div class="metric-item-value">100%</div></div>
+      </div>
+      ${d.expanded_query?`<div style="margin-top:.75rem;font-size:.75rem;color:var(--muted)"><b>Expanded:</b> <em>${d.expanded_query}</em></div>`:''}
+      <div class="chunk-list">${chunksHTML}</div>
+    </div>`;
+  });
+
+  grid.innerHTML+=`
+    <div class="query-card fade-in" style="animation-delay:${qi*0.1}s">
+      <div class="query-card-header" onclick="toggleQuery(this)">
+        <h3>${query}</h3>
+        <span class="query-card-toggle">▼</span>
+      </div>
+      <div class="query-card-body">
+        <div class="query-card-inner">
+          <div class="strat-row">${stratHTML}</div>
+        </div>
+      </div>
+    </div>`;
+});
+
+function toggleQuery(header){
+  const body=header.nextElementSibling;
+  const toggle=header.querySelector('.query-card-toggle');
+  body.classList.toggle('open');
+  toggle.classList.toggle('open');
+}
+</script>
+</body>
+</html>
