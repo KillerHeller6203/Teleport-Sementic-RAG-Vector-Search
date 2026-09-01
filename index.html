@@ -25,11 +25,10 @@
     --accent-blue-dim: rgba(0, 176, 255, 0.15);
     --accent-yellow: #ffd600;
     --accent-yellow-dim: rgba(255, 214, 0, 0.15);
-    --accent-pink: #ff4081;
+    --accent-purple: #ab47bc;
 
     --text-main: #e2e8f0;
     --text-muted: #7f8c9d;
-    --text-dim: #4b586e;
 
     --font-heading: 'Chakra Petch', sans-serif;
     --font-sans: 'Inter', sans-serif;
@@ -73,8 +72,8 @@
     font-family: var(--font-heading);
     font-weight: 700;
     font-size: 15px;
-    letter-spacing: 0.5px;
     color: #fff;
+    cursor: pointer;
   }
 
   .brand-icon {
@@ -88,11 +87,18 @@
     color: #000;
     font-weight: 900;
     font-size: 14px;
+    box-shadow: 0 0 10px var(--accent-green-dim);
+    animation: pulseIcon 3s infinite alternate;
+  }
+
+  @keyframes pulseIcon {
+    0% { box-shadow: 0 0 4px var(--accent-green-dim); }
+    100% { box-shadow: 0 0 14px rgba(0, 230, 118, 0.5); }
   }
 
   .nav-tabs {
     display: flex;
-    gap: 4px;
+    gap: 6px;
   }
 
   .nav-tab {
@@ -103,19 +109,22 @@
     letter-spacing: 0.5px;
     color: var(--text-muted);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     text-transform: uppercase;
+    border: 1px solid transparent;
   }
 
   .nav-tab:hover {
     color: #fff;
     background: rgba(255, 255, 255, 0.05);
+    transform: translateY(-1px);
   }
 
   .nav-tab.active {
     color: #000;
     background: var(--accent-green);
     font-weight: 700;
+    box-shadow: 0 0 12px var(--accent-green-dim);
   }
 
   .nav-right {
@@ -128,7 +137,7 @@
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     color: var(--text-main);
-    padding: 5px 12px;
+    padding: 6px 14px;
     border-radius: 4px;
     font-size: 11px;
     font-family: var(--font-mono);
@@ -136,12 +145,14 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    transition: all 0.2s;
+    transition: all 0.25s ease;
   }
 
   .nav-btn:hover {
     border-color: var(--accent-green);
     color: var(--accent-green);
+    transform: scale(1.03);
+    box-shadow: 0 0 10px var(--accent-green-dim);
   }
 
   .status-tag {
@@ -163,6 +174,12 @@
     background: var(--accent-green);
     border-radius: 50%;
     box-shadow: 0 0 8px var(--accent-green);
+    animation: blinkDot 1.5s infinite alternate;
+  }
+
+  @keyframes blinkDot {
+    0% { opacity: 0.3; }
+    100% { opacity: 1; }
   }
 
   /* --- APP MAIN LAYOUT --- */
@@ -172,65 +189,79 @@
     overflow: hidden;
   }
 
-  /* --- LEFT TOOLBAR / SIDEBAR --- */
+  /* --- LEFT SIDEBAR --- */
   .sidebar {
-    width: 60px;
+    width: 65px;
     background: var(--bg-panel);
     border-right: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 12px 0;
-    gap: 16px;
+    gap: 12px;
   }
 
   .tool-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 6px;
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     color: var(--text-muted);
     cursor: pointer;
-    transition: all 0.2s;
-    gap: 2px;
+    transition: all 0.25s ease;
+    gap: 3px;
+    border: 1px solid transparent;
   }
 
   .tool-btn:hover {
     background: var(--bg-card);
     color: #fff;
+    transform: translateY(-2px);
+    border-color: var(--border-light);
   }
 
   .tool-btn.active {
     background: var(--bg-card);
     color: var(--accent-green);
-    border: 1px solid var(--border-color);
+    border-color: var(--accent-green);
+    box-shadow: 0 0 12px var(--accent-green-dim);
   }
 
-  .tool-icon {
-    font-size: 16px;
-  }
+  .tool-icon { font-size: 16px; }
+  .tool-label { font-size: 8.5px; font-family: var(--font-mono); text-transform: uppercase; font-weight: 600; }
 
-  .tool-label {
-    font-size: 9px;
-    font-family: var(--font-mono);
-    text-transform: uppercase;
-  }
-
-  /* --- MAIN WORKSPACE --- */
-  .workspace {
+  /* --- VIEW CONTAINER --- */
+  .view-container {
     flex: 1;
     display: flex;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .view-pane {
+    position: absolute;
+    inset: 0;
+    display: none;
     flex-direction: column;
     padding: 16px;
     gap: 16px;
     overflow-y: auto;
     background: #0d111a;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
   }
 
-  /* TOP ROW WIDGETS */
+  .view-pane.active {
+    display: flex;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* --- VIEW 1: OVERVIEW DASHBOARD --- */
   .widget-grid-top {
     display: grid;
     grid-template-columns: 280px 1fr 1fr;
@@ -246,6 +277,12 @@
     flex-direction: column;
     position: relative;
     overflow: hidden;
+    transition: transform 0.25s ease, border-color 0.25s ease;
+  }
+
+  .widget-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-light);
   }
 
   .widget-card::before {
@@ -253,7 +290,6 @@
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 2px;
-    background: transparent;
   }
 
   .widget-card.green-accent::before { background: var(--accent-green); }
@@ -269,168 +305,180 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    letter-spacing: 0.5px;
   }
 
-  .widget-sub {
-    font-size: 11px;
-    color: var(--text-muted);
-  }
+  .widget-sub { font-size: 11px; color: var(--text-muted); }
 
-  /* MACHINE INFO / SYSTEM CARD */
-  .system-info-box {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
+  .system-info-box { display: flex; flex-direction: column; gap: 10px; }
   .system-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 6px 10px;
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
-    border: 1px solid rgba(255, 255, 255, 0.03);
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 6px 10px; background: rgba(0, 0, 0, 0.25);
+    border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.03);
   }
+  .system-key { font-size: 11px; color: var(--text-muted); }
+  .system-val { font-family: var(--font-mono); font-size: 11px; color: var(--accent-green); font-weight: 600; }
 
-  .system-key {
-    font-size: 11px;
-    color: var(--text-muted);
-  }
+  .gauge-container { display: flex; align-items: center; justify-content: space-around; height: 100%; }
+  .gauge-donut-wrap { position: relative; width: 110px; height: 110px; }
+  .gauge-center-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+  .gauge-center-val { font-family: var(--font-heading); font-size: 22px; font-weight: 700; color: #fff; }
+  .gauge-center-lbl { font-size: 9px; color: var(--text-muted); text-transform: uppercase; }
 
-  .system-val {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--accent-green);
-    font-weight: 600;
-  }
-
-  /* DONUT & GAUGE CONTAINER */
-  .gauge-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    height: 100%;
-  }
-
-  .gauge-donut-wrap {
-    position: relative;
-    width: 110px;
-    height: 110px;
-  }
-
-  .gauge-center-text {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-  }
-
-  .gauge-center-val {
-    font-family: var(--font-heading);
-    font-size: 22px;
-    font-weight: 700;
-    color: #fff;
-  }
-
-  .gauge-center-lbl {
-    font-size: 9px;
-    color: var(--text-muted);
-    text-transform: uppercase;
-  }
-
-  /* BATTERY / METRIC PROGRESS BARS */
-  .metric-bars {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    justify-content: center;
-    height: 100%;
-  }
-
-  .bar-item {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .bar-header {
-    display: flex;
-    justify-content: space-between;
-    font-size: 11px;
-  }
-
+  .metric-bars { display: flex; flex-direction: column; gap: 12px; justify-content: center; height: 100%; }
+  .bar-item { display: flex; flex-direction: column; gap: 4px; }
+  .bar-header { display: flex; justify-content: space-between; font-size: 11px; }
   .bar-title { color: var(--text-muted); }
   .bar-val { font-family: var(--font-mono); font-weight: 700; color: #fff; }
 
   .bar-track {
-    height: 10px;
-    background: rgba(0,0,0,0.3);
-    border-radius: 3px;
-    overflow: hidden;
-    border: 1px solid var(--border-color);
-    display: flex;
-    gap: 2px;
-    padding: 1px;
+    height: 10px; background: rgba(0,0,0,0.3); border-radius: 3px;
+    overflow: hidden; border: 1px solid var(--border-color); display: flex; gap: 2px; padding: 1px;
   }
-
-  .bar-segment {
-    height: 100%;
-    border-radius: 1px;
-    flex: 1;
-    background: rgba(255, 255, 255, 0.08);
-  }
-
+  .bar-segment { flex: 1; height: 100%; border-radius: 1px; background: rgba(255, 255, 255, 0.08); transition: background 0.5s ease; }
   .bar-segment.active-green { background: var(--accent-green); box-shadow: 0 0 6px var(--accent-green); }
   .bar-segment.active-blue { background: var(--accent-blue); box-shadow: 0 0 6px var(--accent-blue); }
-  .bar-segment.active-yellow { background: var(--accent-yellow); box-shadow: 0 0 6px var(--accent-yellow); }
 
-  /* MAIN LARGE CHART WIDGET */
   .widget-card-large {
-    flex: 1;
+    flex: 1; background: var(--bg-card); border: 1px solid var(--border-color);
+    border-radius: 8px; padding: 18px; display: flex; flex-direction: column; min-height: 280px;
+  }
+  .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .chart-controls { display: flex; gap: 6px; }
+  .chart-btn {
+    background: rgba(0,0,0,0.3); border: 1px solid var(--border-color);
+    color: var(--text-muted); padding: 4px 10px; border-radius: 4px; font-size: 10px;
+    cursor: pointer; font-family: var(--font-mono); transition: all 0.2s ease;
+  }
+  .chart-btn:hover { color: #fff; border-color: var(--border-light); }
+  .chart-btn.active { background: var(--accent-yellow-dim); color: var(--accent-yellow); border-color: var(--accent-yellow); }
+  .chart-canvas-wrap { flex: 1; position: relative; width: 100%; }
+
+  /* --- VIEW 2: RETRIEVAL STRATEGIES VIEW --- */
+  .strategy-banner {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    padding: 18px;
-    display: flex;
-    flex-direction: column;
-    min-height: 280px;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
   }
 
-  .chart-header {
+  .strat-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+
+  .strat-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--accent-green);
+    box-shadow: 0 0 15px var(--accent-green-dim);
+  }
+
+  .strat-card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
+    font-family: var(--font-heading);
+    font-size: 14px;
+    font-weight: 700;
   }
 
-  .chart-controls {
-    display: flex;
-    gap: 6px;
-  }
-
-  .chart-btn {
-    background: rgba(0,0,0,0.3);
-    border: 1px solid var(--border-color);
-    color: var(--text-muted);
-    padding: 4px 10px;
-    border-radius: 4px;
-    font-size: 10px;
-    cursor: pointer;
+  .strat-badge {
     font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 3px;
   }
 
-  .chart-btn.active {
-    background: var(--accent-yellow-dim);
-    color: var(--accent-yellow);
-    border-color: var(--accent-yellow);
+  .pipeline-flow {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
   }
 
-  .chart-canvas-wrap {
-    flex: 1;
+  .flow-steps {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
     position: relative;
-    width: 100%;
+  }
+
+  .flow-step {
+    flex: 1;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 14px;
+    text-align: center;
+    position: relative;
+    animation: flowPulse 2s infinite alternate;
+  }
+
+  @keyframes flowPulse {
+    0% { border-color: var(--border-color); }
+    100% { border-color: var(--accent-blue); }
+  }
+
+  .flow-arrow {
+    color: var(--accent-green);
+    font-size: 18px;
+    font-weight: 900;
+  }
+
+  /* --- VIEW 3: CORPUS DICTIONARY VIEW --- */
+  .corpus-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+  }
+
+  .corpus-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: all 0.2s ease;
+  }
+
+  .corpus-card:hover {
+    border-color: var(--accent-blue);
+    transform: translateY(-2px);
+  }
+
+  .corpus-id {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent-green);
+  }
+
+  .corpus-title {
+    font-family: var(--font-heading);
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .corpus-text {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    line-height: 1.5;
   }
 
   /* --- RIGHT INSPECTOR PANEL --- */
@@ -457,124 +505,59 @@
     text-transform: uppercase;
   }
 
-  .inspector-search {
-    padding: 10px 12px;
-    border-bottom: 1px solid var(--border-color);
-  }
-
+  .inspector-search { padding: 10px 12px; border-bottom: 1px solid var(--border-color); }
   .search-input {
-    width: 100%;
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    padding: 6px 10px;
-    color: var(--text-main);
-    font-size: 11px;
-    font-family: var(--font-sans);
-    outline: none;
+    width: 100%; background: var(--bg-card); border: 1px solid var(--border-color);
+    border-radius: 4px; padding: 6px 10px; color: var(--text-main); font-size: 11px; outline: none;
   }
+  .search-input:focus { border-color: var(--accent-green); }
 
-  .search-input:focus {
-    border-color: var(--accent-green);
-  }
-
-  .object-tree {
-    flex: 1;
-    overflow-y: auto;
-    padding: 8px 0;
-  }
-
-  .tree-section-header {
-    padding: 6px 12px;
-    font-size: 10px;
-    font-family: var(--font-mono);
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    background: rgba(0,0,0,0.2);
-  }
+  .object-tree { flex: 1; overflow-y: auto; padding: 8px 0; }
 
   .tree-item {
-    padding: 8px 12px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    cursor: pointer;
-    border-bottom: 1px solid rgba(255,255,255,0.02);
-    transition: background 0.15s;
+    padding: 8px 12px; display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.02); transition: background 0.15s;
   }
-
-  .tree-item:hover {
-    background: var(--bg-card);
-  }
-
-  .tree-item.selected {
-    background: var(--accent-blue-dim);
-    border-left: 3px solid var(--accent-blue);
-  }
-
-  .tree-item-title {
-    font-size: 11px;
-    color: var(--text-main);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+  .tree-item:hover { background: var(--bg-card); }
+  .tree-item.selected { background: var(--accent-blue-dim); border-left: 3px solid var(--accent-blue); }
+  .tree-item-title { font-size: 11px; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
 
   .tree-item-badge {
-    font-family: var(--font-mono);
-    font-size: 9px;
-    padding: 2px 6px;
-    border-radius: 3px;
-    background: rgba(255,255,255,0.05);
-    color: var(--text-muted);
+    font-family: var(--font-mono); font-size: 9px; padding: 2px 6px; border-radius: 3px;
   }
-
   .tree-item-badge.badge-a { background: var(--accent-blue-dim); color: var(--accent-blue); }
   .tree-item-badge.badge-b { background: var(--accent-green-dim); color: var(--accent-green); }
   .tree-item-badge.badge-hyde { background: var(--accent-yellow-dim); color: var(--accent-yellow); }
 
-  /* PROPERTY INSPECTOR BOX */
-  .property-box {
-    border-top: 1px solid var(--border-color);
-    background: var(--bg-dark);
-    display: flex;
-    flex-direction: column;
-    max-height: 50%;
-  }
+  .property-box { border-top: 1px solid var(--border-color); background: var(--bg-dark); display: flex; flex-direction: column; max-height: 50%; }
+  .property-header { background: var(--accent-green); color: #000; font-family: var(--font-heading); font-weight: 700; font-size: 11px; padding: 6px 12px; }
+  .property-list { overflow-y: auto; padding: 8px 12px; display: flex; flex-direction: column; gap: 6px; }
 
-  .property-header {
-    background: var(--accent-green);
-    color: #000;
-    font-family: var(--font-heading);
-    font-weight: 700;
-    font-size: 11px;
-    padding: 6px 12px;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-  }
-
-  .property-list {
-    overflow-y: auto;
-    padding: 8px 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .prop-row {
-    display: grid;
-    grid-template-columns: 120px 1fr;
-    font-size: 10px;
-    font-family: var(--font-mono);
-    align-items: center;
-  }
-
+  .prop-row { display: grid; grid-template-columns: 120px 1fr; font-size: 10px; font-family: var(--font-mono); align-items: center; }
   .prop-name { color: var(--text-muted); }
   .prop-val { color: var(--text-main); font-weight: 500; word-break: break-all; }
   .prop-val.highlight { color: var(--accent-green); }
 
-  /* CUSTOM SCROLLBARS */
+  /* OVERLAY SCANNING RADAR ANIMATION */
+  .scan-overlay {
+    position: fixed; inset: 0; background: rgba(10, 14, 26, 0.85); z-index: 100;
+    display: none; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(6px);
+  }
+  .scan-radar {
+    width: 120px; height: 120px; border-radius: 50%; border: 2px solid var(--accent-green);
+    position: relative; overflow: hidden; box-shadow: 0 0 20px var(--accent-green-dim);
+  }
+  .scan-sweep {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: conic-gradient(from 0deg, transparent 0deg, var(--accent-green) 360deg);
+    animation: rotateSweep 1.5s linear infinite; opacity: 0.6;
+  }
+  @keyframes rotateSweep { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+  .scan-text {
+    margin-top: 20px; font-family: var(--font-heading); font-size: 16px; font-weight: 700; color: var(--accent-green); letter-spacing: 1px;
+  }
+
   ::-webkit-scrollbar { width: 4px; height: 4px; }
   ::-webkit-scrollbar-track { background: var(--bg-panel); }
   ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
@@ -583,18 +566,26 @@
 </head>
 <body>
 
+  <!-- RUN SCANNING OVERLAY -->
+  <div class="scan-overlay" id="scanOverlay">
+    <div class="scan-radar">
+      <div class="scan-sweep"></div>
+    </div>
+    <div class="scan-text">INGESTING CORPUS & EXECUTING RETRIEVAL TEST...</div>
+  </div>
+
   <!-- TOP NAVBAR -->
   <div class="navbar">
     <div class="nav-left">
-      <div class="brand">
+      <div class="brand" onclick="switchPane('overview')">
         <div class="brand-icon">⚡</div>
         RAG COCKPIT
       </div>
       <div class="nav-tabs">
-        <div class="nav-tab active" onclick="switchNavTab(this, 'overview')">DESIGN WORKSPACE</div>
-        <div class="nav-tab" onclick="switchNavTab(this, 'strategies')">RETRIEVAL STRATEGIES</div>
-        <div class="nav-tab" onclick="switchNavTab(this, 'corpus')">DOCUMENT CORPUS</div>
-        <div class="nav-tab" onclick="switchNavTab(this, 'benchmarks')">LATENCY BENCHMARKS</div>
+        <div class="nav-tab active" id="tab-overview" onclick="switchPane('overview')">DESIGN WORKSPACE</div>
+        <div class="nav-tab" id="tab-strategies" onclick="switchPane('strategies')">RETRIEVAL STRATEGIES</div>
+        <div class="nav-tab" id="tab-corpus" onclick="switchPane('corpus')">DOCUMENT CORPUS</div>
+        <div class="nav-tab" id="tab-benchmarks" onclick="switchPane('benchmarks')">LATENCY BENCHMARKS</div>
       </div>
     </div>
     <div class="nav-right">
@@ -602,7 +593,7 @@
         <div class="status-dot"></div>
         FAISS INDEX ONLINE
       </div>
-      <button class="nav-btn" onclick="runBenchmark()">▶ RUN TEST</button>
+      <button class="nav-btn" onclick="runBenchmarkAnimation()">▶ RUN TEST</button>
       <button class="nav-btn" onclick="exportResults()">💾 EXPORT JSON</button>
     </div>
   </div>
@@ -610,148 +601,199 @@
   <!-- APP BODY LAYOUT -->
   <div class="app-body">
     
-    <!-- LEFT TOOLBAR -->
+    <!-- LEFT SIDEBAR -->
     <div class="sidebar">
-      <div class="tool-btn active" title="Cockpit Overview">
+      <div class="tool-btn active" id="side-overview" onclick="switchPane('overview')" title="Cockpit Overview">
         <div class="tool-icon">📊</div>
         <div class="tool-label">OVERVIEW</div>
       </div>
-      <div class="tool-btn" title="Strategy A (Baseline)">
+      <div class="tool-btn" id="side-strat-a" onclick="selectStrategyView('A')" title="Strategy A (Baseline)">
         <div class="tool-icon">⚡</div>
         <div class="tool-label">STRAT A</div>
       </div>
-      <div class="tool-btn" title="Strategy B (Expansion)">
+      <div class="tool-btn" id="side-strat-b" onclick="selectStrategyView('B')" title="Strategy B (Expansion)">
         <div class="tool-icon">🔀</div>
         <div class="tool-label">STRAT B</div>
       </div>
-      <div class="tool-btn" title="HyDE (Hypothetical)">
+      <div class="tool-btn" id="side-hyde" onclick="selectStrategyView('HYDE')" title="HyDE (Hypothetical)">
         <div class="tool-icon">🔮</div>
         <div class="tool-label">HYDE</div>
       </div>
-      <div class="tool-btn" title="Corpus Dictionary">
+      <div class="tool-btn" id="side-corpus" onclick="switchPane('corpus')" title="Corpus Dictionary">
         <div class="tool-icon">📚</div>
         <div class="tool-label">CORPUS</div>
       </div>
     </div>
 
-    <!-- MAIN WORKSPACE -->
-    <div class="workspace">
+    <!-- VIEW CONTAINER -->
+    <div class="view-container">
 
-      <!-- TOP ROW WIDGETS -->
-      <div class="widget-grid-top">
-        
-        <!-- CARD 1: SYSTEM INFO -->
-        <div class="widget-card green-accent">
-          <div class="widget-title">
-            <span>ENGINE METADATA</span>
-            <span class="widget-sub">FAISS IndexFlatIP</span>
-          </div>
-          <div class="system-info-box">
-            <div class="system-row">
-              <span class="system-key">Embedder Model</span>
-              <span class="system-val">all-MiniLM-L6-v2</span>
+      <!-- PANE 1: OVERVIEW DASHBOARD -->
+      <div class="view-pane active" id="pane-overview">
+        <div class="widget-grid-top">
+          <!-- CARD 1: SYSTEM INFO -->
+          <div class="widget-card green-accent">
+            <div class="widget-title">
+              <span>ENGINE METADATA</span>
+              <span class="widget-sub">FAISS IndexFlatIP</span>
             </div>
-            <div class="system-row">
-              <span class="system-key">Vector Dim</span>
-              <span class="system-val">384 Dimensions</span>
-            </div>
-            <div class="system-row">
-              <span class="system-key">Corpus Documents</span>
-              <span class="system-val">10 Tech Docs</span>
-            </div>
-            <div class="system-row">
-              <span class="system-key">FAISS Chunks</span>
-              <span class="system-val">49 Chunks</span>
+            <div class="system-info-box">
+              <div class="system-row"><span class="system-key">Embedder Model</span><span class="system-val">all-MiniLM-L6-v2</span></div>
+              <div class="system-row"><span class="system-key">Vector Dim</span><span class="system-val">384 Dimensions</span></div>
+              <div class="system-row"><span class="system-key">Corpus Documents</span><span class="system-val">10 Tech Docs</span></div>
+              <div class="system-row"><span class="system-key">FAISS Chunks</span><span class="system-val">49 Chunks</span></div>
             </div>
           </div>
-        </div>
 
-        <!-- CARD 2: DONUT GAUGE (CURRENT OIL LEVEL / MRR SCORE) -->
-        <div class="widget-card blue-accent">
-          <div class="widget-title">
-            <span>ACCURACY SCORE (MRR)</span>
-            <span class="widget-sub">Target: 1.00</span>
-          </div>
-          <div class="gauge-container">
-            <div class="gauge-donut-wrap">
-              <canvas id="mrrDonutChart"></canvas>
-              <div class="gauge-center-text">
-                <div class="gauge-center-val">100%</div>
-                <div class="gauge-center-lbl">Hit Rate</div>
+          <!-- CARD 2: DONUT GAUGE -->
+          <div class="widget-card blue-accent">
+            <div class="widget-title">
+              <span>ACCURACY SCORE (MRR)</span>
+              <span class="widget-sub">Target: 1.00</span>
+            </div>
+            <div class="gauge-container">
+              <div class="gauge-donut-wrap">
+                <canvas id="mrrDonutChart"></canvas>
+                <div class="gauge-center-text">
+                  <div class="gauge-center-val">100%</div>
+                  <div class="gauge-center-lbl">Hit Rate</div>
+                </div>
+              </div>
+              <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);">
+                <div>• Strategy A: <span style="color: var(--accent-blue)">1.000</span></div>
+                <div>• Strategy B: <span style="color: var(--accent-green)">1.000</span></div>
+                <div>• HyDE: <span style="color: var(--accent-yellow)">1.000</span></div>
               </div>
             </div>
-            <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);">
-              <div>• Strategy A: <span style="color: var(--accent-blue)">1.000</span></div>
-              <div>• Strategy B: <span style="color: var(--accent-green)">1.000</span></div>
-              <div>• HyDE: <span style="color: var(--accent-yellow)">1.000</span></div>
-            </div>
           </div>
-        </div>
 
-        <!-- CARD 3: BATTERY STATE / PRECISION & RECALL -->
-        <div class="widget-card yellow-accent">
-          <div class="widget-title">
-            <span>RETRIEVAL METRICS STATE</span>
-            <span class="widget-sub">Average Precision & Recall</span>
-          </div>
-          <div class="metric-bars">
-            <div class="bar-item">
-              <div class="bar-header">
-                <span class="bar-title">Context Precision (Noise Reduction)</span>
-                <span class="bar-val">88.9%</span>
-              </div>
-              <div class="bar-track">
-                <div class="bar-segment active-blue"></div>
-                <div class="bar-segment active-blue"></div>
-                <div class="bar-segment active-blue"></div>
-                <div class="bar-segment active-blue"></div>
-                <div class="bar-segment active-blue"></div>
-                <div class="bar-segment active-blue"></div>
-                <div class="bar-segment active-blue"></div>
-                <div class="bar-segment active-blue"></div>
-                <div class="bar-segment"></div>
-                <div class="bar-segment"></div>
-              </div>
+          <!-- CARD 3: METRIC BARS -->
+          <div class="widget-card yellow-accent">
+            <div class="widget-title">
+              <span>RETRIEVAL METRICS STATE</span>
+              <span class="widget-sub">Average Precision & Recall</span>
             </div>
-
-            <div class="bar-item">
-              <div class="bar-header">
-                <span class="bar-title">Context Recall (Completeness)</span>
-                <span class="bar-val">52.8%</span>
+            <div class="metric-bars">
+              <div class="bar-item">
+                <div class="bar-header"><span class="bar-title">Context Precision (Noise Reduction)</span><span class="bar-val">88.9%</span></div>
+                <div class="bar-track">
+                  <div class="bar-segment active-blue"></div><div class="bar-segment active-blue"></div>
+                  <div class="bar-segment active-blue"></div><div class="bar-segment active-blue"></div>
+                  <div class="bar-segment active-blue"></div><div class="bar-segment active-blue"></div>
+                  <div class="bar-segment active-blue"></div><div class="bar-segment active-blue"></div>
+                  <div class="bar-segment"></div><div class="bar-segment"></div>
+                </div>
               </div>
-              <div class="bar-track">
-                <div class="bar-segment active-green"></div>
-                <div class="bar-segment active-green"></div>
-                <div class="bar-segment active-green"></div>
-                <div class="bar-segment active-green"></div>
-                <div class="bar-segment active-green"></div>
-                <div class="bar-segment"></div>
-                <div class="bar-segment"></div>
-                <div class="bar-segment"></div>
-                <div class="bar-segment"></div>
-                <div class="bar-segment"></div>
+              <div class="bar-item">
+                <div class="bar-header"><span class="bar-title">Context Recall (Completeness)</span><span class="bar-val">52.8%</span></div>
+                <div class="bar-track">
+                  <div class="bar-segment active-green"></div><div class="bar-segment active-green"></div>
+                  <div class="bar-segment active-green"></div><div class="bar-segment active-green"></div>
+                  <div class="bar-segment active-green"></div><div class="bar-segment"></div>
+                  <div class="bar-segment"></div><div class="bar-segment"></div>
+                  <div class="bar-segment"></div><div class="bar-segment"></div>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
+        <!-- MAIN LARGE CHART WIDGET -->
+        <div class="widget-card-large">
+          <div class="chart-header">
+            <div>
+              <div class="widget-title" style="margin:0">LATENCY & STAGE PERFORMANCE TIMELINE</div>
+              <div class="widget-sub">Response Latency across Strategies A, B, and HyDE</div>
+            </div>
+            <div class="chart-controls">
+              <button class="chart-btn active" onclick="switchChartMetric('latency')">LATENCY (MS)</button>
+              <button class="chart-btn" onclick="switchChartMetric('precision')">PRECISION</button>
+              <button class="chart-btn" onclick="switchChartMetric('recall')">RECALL</button>
+            </div>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="timelineChart"></canvas>
+          </div>
+        </div>
       </div>
 
-      <!-- MAIN LARGE WIDGET: AMBIENT GLOWING LINE CHART -->
-      <div class="widget-card-large">
-        <div class="chart-header">
-          <div>
-            <div class="widget-title" style="margin:0">LATENCY & STAGE PERFORMANCE TIMELINE</div>
-            <div class="widget-sub">Response Latency across Strategies A, B, and HyDE</div>
+      <!-- PANE 2: RETRIEVAL STRATEGIES DEEP DIVE -->
+      <div class="view-pane" id="pane-strategies">
+        <div class="strategy-banner">
+          <div class="strat-card" onclick="highlightPipeline('A')">
+            <div class="strat-card-header">
+              <span>STRATEGY A</span>
+              <span class="strat-badge" style="background:var(--accent-blue-dim);color:var(--accent-blue)">BASELINE</span>
+            </div>
+            <div style="font-size:11px;color:var(--text-muted)">Direct query embedding search without preprocessing or reranking.</div>
+            <div style="font-family:var(--font-mono);font-size:11px;color:var(--accent-blue);margin-top:auto">Avg Latency: 12.6 ms</div>
           </div>
-          <div class="chart-controls">
-            <button class="chart-btn active" onclick="switchChartMetric('latency')">LATENCY (MS)</button>
-            <button class="chart-btn" onclick="switchChartMetric('precision')">PRECISION</button>
-            <button class="chart-btn" onclick="switchChartMetric('recall')">RECALL</button>
+
+          <div class="strat-card" onclick="highlightPipeline('B')">
+            <div class="strat-card-header">
+              <span>STRATEGY B</span>
+              <span class="strat-badge" style="background:var(--accent-green-dim);color:var(--accent-green)">ENHANCED</span>
+            </div>
+            <div style="font-size:11px;color:var(--text-muted)">Query Expansion + MMR Rerank + CrossEncoder Rerank + Compression.</div>
+            <div style="font-family:var(--font-mono);font-size:11px;color:var(--accent-green);margin-top:auto">Avg Latency: 194.5 ms</div>
+          </div>
+
+          <div class="strat-card" onclick="highlightPipeline('HYDE')">
+            <div class="strat-card-header">
+              <span>HYDE</span>
+              <span class="strat-badge" style="background:var(--accent-yellow-dim);color:var(--accent-yellow)">HYPOTHETICAL</span>
+            </div>
+            <div style="font-size:11px;color:var(--text-muted)">Generates hypothetical answer docs, embeds and averages them.</div>
+            <div style="font-family:var(--font-mono);font-size:11px;color:var(--accent-yellow);margin-top:auto">Avg Latency: 101.9 ms</div>
           </div>
         </div>
-        <div class="chart-canvas-wrap">
-          <canvas id="timelineChart"></canvas>
+
+        <!-- PIPELINE STEP VISUALIZER -->
+        <div class="pipeline-flow">
+          <div class="widget-title">ACTIVE PIPELINE FLOW ARCHITECTURE</div>
+          <div class="flow-steps">
+            <div class="flow-step">
+              <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent-green)">STAGE 1</div>
+              <div style="font-weight:700;color:#fff;margin-top:4px">QUERY EXPANSION</div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:2px" id="flow-stage-1">MockGenerativeModel</div>
+            </div>
+            <div class="flow-arrow">➔</div>
+            <div class="flow-step">
+              <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent-blue)">STAGE 2</div>
+              <div style="font-weight:700;color:#fff;margin-top:4px">FAISS SEARCH</div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:2px">IndexFlatIP (Cosine)</div>
+            </div>
+            <div class="flow-arrow">➔</div>
+            <div class="flow-step">
+              <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent-yellow)">STAGE 3</div>
+              <div style="font-weight:700;color:#fff;margin-top:4px">CROSS-ENCODER</div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:2px">ms-marco-MiniLM-L6</div>
+            </div>
+            <div class="flow-arrow">➔</div>
+            <div class="flow-step">
+              <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent-purple)">STAGE 4</div>
+              <div style="font-weight:700;color:#fff;margin-top:4px">LOST-IN-MIDDLE</div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:2px">Context Reordering</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANE 3: DOCUMENT CORPUS -->
+      <div class="view-pane" id="pane-corpus">
+        <div class="widget-title">DOCUMENT CORPUS DICTIONARY (10 TECHNICAL DOCS)</div>
+        <div class="corpus-grid" id="corpusGrid">
+          <!-- Injected via JS -->
+        </div>
+      </div>
+
+      <!-- PANE 4: BENCHMARKS & STAGE TIMING -->
+      <div class="view-pane" id="pane-benchmarks">
+        <div class="widget-card-large">
+          <div class="widget-title">STAGE-BY-STAGE LATENCY BREAKDOWN (MS)</div>
+          <div class="chart-canvas-wrap">
+            <canvas id="stageChart"></canvas>
+          </div>
         </div>
       </div>
 
@@ -759,63 +801,29 @@
 
     <!-- RIGHT INSPECTOR PANEL -->
     <div class="inspector">
-      
-      <div class="inspector-header-cap">
-        OBJECT BROWSER ▲
-      </div>
-
+      <div class="inspector-header-cap">OBJECT BROWSER ▲</div>
       <div class="inspector-search">
         <input type="text" class="search-input" placeholder="Search Query / Chunk ID..." onkeyup="filterTree(this.value)" />
       </div>
-
-      <!-- QUERY & CHUNK TREE -->
-      <div class="object-tree" id="objectTree">
-        <!-- Injected via JavaScript -->
-      </div>
-
-      <!-- PROPERTY INSPECTOR -->
+      <div class="object-tree" id="objectTree"></div>
       <div class="property-box">
-        <div class="property-header">
-          OBJECT INSPECTOR (PROPERTIES)
-        </div>
+        <div class="property-header">OBJECT INSPECTOR (PROPERTIES)</div>
         <div class="property-list" id="propertyList">
-          <div class="prop-row">
-            <span class="prop-name">Selected Query</span>
-            <span class="prop-val highlight" id="propQuery">How does the system handle peak load?</span>
-          </div>
-          <div class="prop-row">
-            <span class="prop-name">Active Strategy</span>
-            <span class="prop-val" id="propStrat">Strategy B (Expansion)</span>
-          </div>
-          <div class="prop-row">
-            <span class="prop-name">Latency</span>
-            <span class="prop-val" id="propLat">244.6 ms</span>
-          </div>
-          <div class="prop-row">
-            <span class="prop-name">Top Chunk</span>
-            <span class="prop-val" id="propChunk">doc_01_chunk_1</span>
-          </div>
-          <div class="prop-row">
-            <span class="prop-name">Cosine Score</span>
-            <span class="prop-val highlight" id="propScore">0.6325</span>
-          </div>
-          <div class="prop-row">
-            <span class="prop-name">Expanded Terms</span>
-            <span class="prop-val" id="propTerms">traffic surge, demand spike, horizontal scaling</span>
-          </div>
-          <div class="prop-row">
-            <span class="prop-name">Lost-in-Middle</span>
-            <span class="prop-val" id="propLim">Active (Reordered)</span>
-          </div>
+          <div class="prop-row"><span class="prop-name">Selected Query</span><span class="prop-val highlight" id="propQuery">How does the system handle peak load?</span></div>
+          <div class="prop-row"><span class="prop-name">Active Strategy</span><span class="prop-val" id="propStrat">Strategy B (Expansion)</span></div>
+          <div class="prop-row"><span class="prop-name">Latency</span><span class="prop-val" id="propLat">244.6 ms</span></div>
+          <div class="prop-row"><span class="prop-name">Top Chunk</span><span class="prop-val" id="propChunk">doc_01_chunk_1</span></div>
+          <div class="prop-row"><span class="prop-name">Cosine Score</span><span class="prop-val highlight" id="propScore">0.6325</span></div>
+          <div class="prop-row"><span class="prop-name">Expanded Terms</span><span class="prop-val" id="propTerms">traffic surge, demand spike</span></div>
+          <div class="prop-row"><span class="prop-name">Lost-in-Middle</span><span class="prop-val" id="propLim">Active (Reordered)</span></div>
         </div>
       </div>
-
     </div>
 
   </div>
 
 <script>
-// DATA SOURCE
+// DATA SOURCES
 const DATA = {
   "evaluation_metrics": {
     "How does the system handle peak load?": {
@@ -847,121 +855,97 @@ const DATA = {
   ]
 };
 
-// ─── 1. DONUT GAUGE CHART ───
+const CORPUS = [
+  { id: "doc_01", title: "Horizontal Scaling Under Peak Load", text: "Horizontal scaling distributes incoming traffic across multiple server instances to maintain low latency during demand surges..." },
+  { id: "doc_02", title: "Auto-Scaling Policies and Triggers", text: "Auto-scaling policies define the rules that govern when and how compute resources are added or removed..." },
+  { id: "doc_03", title: "Rate Limiting and Throttling Strategies", text: "Rate limiting controls the volume of requests a client can issue within a given time window..." },
+  { id: "doc_04", title: "Distributed Caching Strategies", text: "Distributed caches such as Redis and Memcached store frequently accessed data in memory..." },
+  { id: "doc_05", title: "Circuit Breaker Pattern for Fault Tolerance", text: "The circuit breaker pattern monitors outbound calls to a dependency and trips open when failure rate exceeds threshold..." },
+  { id: "doc_06", title: "Vector Index Performance and ANN Algorithms", text: "Approximate nearest-neighbor algorithms trade a small amount of recall for speedup over brute-force search..." },
+  { id: "doc_07", title: "Embedding Model Latency and Batching", text: "Transformer-based embedding models incur non-trivial inference latency when encoding long sequences..." },
+  { id: "doc_08", title: "Database Connection Pooling Under High Concurrency", text: "Connection pooling maintains a reusable set of database connections..." },
+  { id: "doc_09", title: "Load Balancer Algorithms", text: "Load balancers distribute inbound requests across a pool of backend servers..." },
+  { id: "doc_10", title: "Monitoring and Alerting During Traffic Spikes", text: "Effective monitoring during traffic spikes relies on real-time dashboards surfacing four golden signals..." }
+];
+
+// ─── DYNAMIC VIEW SWITCHER ───
+function switchPane(paneId) {
+  // Update Top Tabs
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  const targetTab = document.getElementById(`tab-${paneId}`);
+  if (targetTab) targetTab.classList.add('active');
+
+  // Update Left Sidebar
+  document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+  const targetSide = document.getElementById(`side-${paneId}`);
+  if (targetSide) targetSide.classList.add('active');
+
+  // Switch Active View Pane with animation
+  document.querySelectorAll('.view-pane').forEach(p => p.classList.remove('active'));
+  const targetPane = document.getElementById(`pane-${paneId}`);
+  if (targetPane) targetPane.classList.add('active');
+
+  if (paneId === 'corpus') renderCorpus();
+  if (paneId === 'benchmarks') renderStageChart();
+}
+
+function selectStrategyView(strat) {
+  switchPane('strategies');
+  highlightPipeline(strat);
+  const sideBtn = document.getElementById(`side-strat-${strat.toLowerCase()}`);
+  if (sideBtn) {
+    document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+    sideBtn.classList.add('active');
+  }
+}
+
+function highlightPipeline(strat) {
+  const el = document.getElementById('flow-stage-1');
+  if (strat === 'A') el.innerText = "Direct Pass (No Expansion)";
+  if (strat === 'B') el.innerText = "QueryExpander (Synonyms)";
+  if (strat === 'HYDE') el.innerText = "HyDERetriever (Fake Answer)";
+}
+
+// ─── CHARTS INITIALIZATION ───
 const donutCtx = document.getElementById('mrrDonutChart').getContext('2d');
 new Chart(donutCtx, {
   type: 'doughnut',
-  data: {
-    datasets: [{
-      data: [100, 0],
-      backgroundColor: ['#00b0ff', 'rgba(255,255,255,0.05)'],
-      borderWidth: 0
-    }]
-  },
-  options: {
-    cutout: '78%',
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: { tooltip: { enabled: false } }
-  }
+  data: { datasets: [{ data: [100, 0], backgroundColor: ['#00b0ff', 'rgba(255,255,255,0.05)'], borderWidth: 0 }] },
+  options: { cutout: '78%', responsive: true, maintainAspectRatio: false, plugins: { tooltip: { enabled: false } } }
 });
 
-// ─── 2. LARGE AMBIENT GLOWING TIMELINE CHART ───
 const timelineCtx = document.getElementById('timelineChart').getContext('2d');
-
 let gradientYellow = timelineCtx.createLinearGradient(0, 0, 0, 240);
-gradientYellow.addColorStop(0, 'rgba(255, 214, 0, 0.35)');
-gradientYellow.addColorStop(1, 'rgba(255, 214, 0, 0.0)');
-
+gradientYellow.addColorStop(0, 'rgba(255, 214, 0, 0.35)'); gradientYellow.addColorStop(1, 'rgba(255, 214, 0, 0.0)');
 let gradientGreen = timelineCtx.createLinearGradient(0, 0, 0, 240);
-gradientGreen.addColorStop(0, 'rgba(0, 230, 118, 0.25)');
-gradientGreen.addColorStop(1, 'rgba(0, 230, 118, 0.0)');
-
+gradientGreen.addColorStop(0, 'rgba(0, 230, 118, 0.25)'); gradientGreen.addColorStop(1, 'rgba(0, 230, 118, 0.0)');
 let gradientBlue = timelineCtx.createLinearGradient(0, 0, 0, 240);
-gradientBlue.addColorStop(0, 'rgba(0, 176, 255, 0.25)');
-gradientBlue.addColorStop(1, 'rgba(0, 176, 255, 0.0)');
+gradientBlue.addColorStop(0, 'rgba(0, 176, 255, 0.25)'); gradientBlue.addColorStop(1, 'rgba(0, 176, 255, 0.0)');
 
 const timelineChart = new Chart(timelineCtx, {
   type: 'line',
   data: {
     labels: ['Query 1 (Peak Load)', 'Query 2 (Caching)', 'Query 3 (Failures)'],
     datasets: [
-      {
-        label: 'Strategy B (Expansion)',
-        data: [244.6, 166.3, 172.6],
-        borderColor: '#ffd600',
-        backgroundColor: gradientYellow,
-        fill: true,
-        tension: 0.45,
-        borderWidth: 3,
-        pointBackgroundColor: '#ffffff',
-        pointBorderColor: '#ffd600',
-        pointRadius: 6,
-        pointHoverRadius: 8
-      },
-      {
-        label: 'Strategy HyDE',
-        data: [101.8, 104.4, 99.6],
-        borderColor: '#00e676',
-        backgroundColor: gradientGreen,
-        fill: true,
-        tension: 0.45,
-        borderWidth: 2,
-        pointBackgroundColor: '#ffffff',
-        pointBorderColor: '#00e676',
-        pointRadius: 5
-      },
-      {
-        label: 'Strategy A (Baseline)',
-        data: [16.0, 10.3, 11.4],
-        borderColor: '#00b0ff',
-        backgroundColor: gradientBlue,
-        fill: true,
-        tension: 0.45,
-        borderWidth: 2,
-        pointBackgroundColor: '#ffffff',
-        pointBorderColor: '#00b0ff',
-        pointRadius: 5
-      }
+      { label: 'Strategy B (Expansion)', data: [244.6, 166.3, 172.6], borderColor: '#ffd600', backgroundColor: gradientYellow, fill: true, tension: 0.45, borderWidth: 3, pointRadius: 6 },
+      { label: 'Strategy HyDE', data: [101.8, 104.4, 99.6], borderColor: '#00e676', backgroundColor: gradientGreen, fill: true, tension: 0.45, borderWidth: 2, pointRadius: 5 },
+      { label: 'Strategy A (Baseline)', data: [16.0, 10.3, 11.4], borderColor: '#00b0ff', backgroundColor: gradientBlue, fill: true, tension: 0.45, borderWidth: 2, pointRadius: 5 }
     ]
   },
   options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: 'top',
-        align: 'end',
-        labels: {
-          color: '#7f8c9d',
-          font: { family: 'JetBrains Mono', size: 11 },
-          usePointStyle: true,
-          pointStyle: 'circle'
-        }
-      }
-    },
-    scales: {
-      y: {
-        grid: { color: 'rgba(255,255,255,0.04)', borderDash: [4, 4] },
-        ticks: { color: '#7f8c9d', font: { family: 'JetBrains Mono', size: 10 } }
-      },
-      x: {
-        grid: { color: 'rgba(255,255,255,0.04)' },
-        ticks: { color: '#e2e8f0', font: { family: 'Chakra Petch', size: 11 } }
-      }
-    }
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'top', align: 'end', labels: { color: '#7f8c9d', font: { family: 'JetBrains Mono', size: 11 } } } },
+    scales: { y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#7f8c9d' } }, x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#e2e8f0' } } }
   }
 });
 
 function switchChartMetric(metric) {
   document.querySelectorAll('.chart-btn').forEach(b => b.classList.remove('active'));
   event.target.classList.add('active');
-
   if (metric === 'latency') {
     timelineChart.data.datasets[0].data = [244.6, 166.3, 172.6];
     timelineChart.data.datasets[1].data = [101.8, 104.4, 99.6];
     timelineChart.data.datasets[2].data = [16.0, 10.3, 11.4];
-    timelineChart.options.scales.y.title = { display: true, text: 'ms', color: '#7f8c9d' };
   } else if (metric === 'precision') {
     timelineChart.data.datasets[0].data = [1.0, 0.6667, 1.0];
     timelineChart.data.datasets[1].data = [0.6667, 0.6667, 1.0];
@@ -974,21 +958,53 @@ function switchChartMetric(metric) {
   timelineChart.update();
 }
 
-// ─── 3. POPULATE RIGHT OBJECT BROWSER TREE ───
+// ─── STAGE CHART FOR BENCHMARKS PANE ───
+let stageChart = null;
+function renderStageChart() {
+  if (stageChart) return;
+  const ctx = document.getElementById('stageChart').getContext('2d');
+  stageChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Strategy A', 'Strategy B', 'Strategy HyDE'],
+      datasets: [
+        { label: 'Expansion (ms)', data: [0, 0.3, 32.0], backgroundColor: '#00e676' },
+        { label: 'FAISS Search (ms)', data: [12.5, 13.8, 0], backgroundColor: '#00b0ff' },
+        { label: 'Cross-Encoder Rerank (ms)', data: [0, 62.1, 69.9], backgroundColor: '#ffd600' }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      scales: { x: { stacked: true }, y: { stacked: true } }
+    }
+  });
+}
+
+// ─── CORPUS RENDERING ───
+function renderCorpus() {
+  const container = document.getElementById('corpusGrid');
+  container.innerHTML = '';
+  CORPUS.forEach(doc => {
+    container.innerHTML += `
+      <div class="corpus-card">
+        <div class="corpus-id">${doc.id}</div>
+        <div class="corpus-title">${doc.title}</div>
+        <div class="corpus-text">${doc.text}</div>
+      </div>
+    `;
+  });
+}
+
+// ─── RIGHT TREE & INSPECTOR ───
 function buildTree() {
   const container = document.getElementById('objectTree');
   container.innerHTML = '';
-
   DATA.benchmark_details.forEach((d, idx) => {
     const isSelected = idx === 1 ? 'selected' : '';
     const badgeClass = d.strategy === 'A' ? 'badge-a' : (d.strategy === 'B' ? 'badge-b' : 'badge-hyde');
-    
     container.innerHTML += `
       <div class="tree-item ${isSelected}" onclick="selectObject(${idx}, this)">
-        <div class="tree-item-title">
-          <span>⚡</span>
-          <span>${d.query.slice(0, 22)}...</span>
-        </div>
+        <div class="tree-item-title"><span>⚡</span><span>${d.query.slice(0, 22)}...</span></div>
         <span class="tree-item-badge ${badgeClass}">STRAT ${d.strategy}</span>
       </div>
     `;
@@ -1009,32 +1025,26 @@ function selectObject(index, element) {
 }
 
 function filterTree(query) {
-  const items = document.querySelectorAll('.tree-item');
-  items.forEach(item => {
-    const text = item.innerText.toLowerCase();
-    item.style.display = text.includes(query.toLowerCase()) ? 'flex' : 'none';
+  document.querySelectorAll('.tree-item').forEach(item => {
+    item.style.display = item.innerText.toLowerCase().includes(query.toLowerCase()) ? 'flex' : 'none';
   });
 }
 
-function switchNavTab(element, tabName) {
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  element.classList.add('active');
-}
-
-function runBenchmark() {
-  alert("Running full RAG retrieval test against FAISS Index... Completed in 12.6ms!");
+// ─── SCAN OVERLAY ANIMATION ───
+function runBenchmarkAnimation() {
+  const overlay = document.getElementById('scanOverlay');
+  overlay.style.display = 'flex';
+  setTimeout(() => {
+    overlay.style.display = 'none';
+  }, 1800);
 }
 
 function exportResults() {
   const blob = new Blob([JSON.stringify(DATA, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'benchmark_results.json';
-  a.click();
+  const a = document.createElement('a'); a.href = url; a.download = 'benchmark_results.json'; a.click();
 }
 
-// Initialise Tree
 buildTree();
 </script>
 </body>
