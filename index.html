@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>RAG Vector Search Cockpit</title>
+<title>Semantic RAG Vector Search</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -71,9 +71,11 @@
     gap: 10px;
     font-family: var(--font-heading);
     font-weight: 700;
-    font-size: 15px;
+    font-size: 14px;
+    letter-spacing: 0.5px;
     color: #fff;
     cursor: pointer;
+    text-transform: uppercase;
   }
 
   .brand-icon {
@@ -188,50 +190,6 @@
     display: flex;
     overflow: hidden;
   }
-
-  /* --- LEFT SIDEBAR --- */
-  .sidebar {
-    width: 65px;
-    background: var(--bg-panel);
-    border-right: 1px solid var(--border-color);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 12px 0;
-    gap: 12px;
-  }
-
-  .tool-btn {
-    width: 48px;
-    height: 48px;
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-muted);
-    cursor: pointer;
-    transition: all 0.25s ease;
-    gap: 3px;
-    border: 1px solid transparent;
-  }
-
-  .tool-btn:hover {
-    background: var(--bg-card);
-    color: #fff;
-    transform: translateY(-2px);
-    border-color: var(--border-light);
-  }
-
-  .tool-btn.active {
-    background: var(--bg-card);
-    color: var(--accent-green);
-    border-color: var(--accent-green);
-    box-shadow: 0 0 12px var(--accent-green-dim);
-  }
-
-  .tool-icon { font-size: 16px; }
-  .tool-label { font-size: 8.5px; font-family: var(--font-mono); text-transform: uppercase; font-weight: 600; }
 
   /* --- VIEW CONTAINER --- */
   .view-container {
@@ -579,7 +537,7 @@
     <div class="nav-left">
       <div class="brand" onclick="switchPane('overview')">
         <div class="brand-icon">⚡</div>
-        RAG COCKPIT
+        sementic-rag-vector-search
       </div>
       <div class="nav-tabs">
         <div class="nav-tab active" id="tab-overview" onclick="switchPane('overview')">DESIGN WORKSPACE</div>
@@ -601,30 +559,6 @@
   <!-- APP BODY LAYOUT -->
   <div class="app-body">
     
-    <!-- LEFT SIDEBAR -->
-    <div class="sidebar">
-      <div class="tool-btn active" id="side-overview" onclick="switchPane('overview')" title="Cockpit Overview">
-        <div class="tool-icon">📊</div>
-        <div class="tool-label">OVERVIEW</div>
-      </div>
-      <div class="tool-btn" id="side-strat-a" onclick="selectStrategyView('A')" title="Strategy A (Baseline)">
-        <div class="tool-icon">⚡</div>
-        <div class="tool-label">STRAT A</div>
-      </div>
-      <div class="tool-btn" id="side-strat-b" onclick="selectStrategyView('B')" title="Strategy B (Expansion)">
-        <div class="tool-icon">🔀</div>
-        <div class="tool-label">STRAT B</div>
-      </div>
-      <div class="tool-btn" id="side-hyde" onclick="selectStrategyView('HYDE')" title="HyDE (Hypothetical)">
-        <div class="tool-icon">🔮</div>
-        <div class="tool-label">HYDE</div>
-      </div>
-      <div class="tool-btn" id="side-corpus" onclick="switchPane('corpus')" title="Corpus Dictionary">
-        <div class="tool-icon">📚</div>
-        <div class="tool-label">CORPUS</div>
-      </div>
-    </div>
-
     <!-- VIEW CONTAINER -->
     <div class="view-container">
 
@@ -875,11 +809,6 @@ function switchPane(paneId) {
   const targetTab = document.getElementById(`tab-${paneId}`);
   if (targetTab) targetTab.classList.add('active');
 
-  // Update Left Sidebar
-  document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-  const targetSide = document.getElementById(`side-${paneId}`);
-  if (targetSide) targetSide.classList.add('active');
-
   // Switch Active View Pane with animation
   document.querySelectorAll('.view-pane').forEach(p => p.classList.remove('active'));
   const targetPane = document.getElementById(`pane-${paneId}`);
@@ -892,11 +821,6 @@ function switchPane(paneId) {
 function selectStrategyView(strat) {
   switchPane('strategies');
   highlightPipeline(strat);
-  const sideBtn = document.getElementById(`side-strat-${strat.toLowerCase()}`);
-  if (sideBtn) {
-    document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-    sideBtn.classList.add('active');
-  }
 }
 
 function highlightPipeline(strat) {
